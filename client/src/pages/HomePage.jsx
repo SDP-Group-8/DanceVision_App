@@ -1,6 +1,7 @@
 import React from "react";
-import UploadButton from "../components/UploadButton";
-import SeeVideosButton from "../components/SeeVideosButton";
+
+import { UploadButton } from "../components/UploadButton";
+import { SeeVideosButton } from "../components/SeeVideosButton";
 
 function HomePage() {
     return(
