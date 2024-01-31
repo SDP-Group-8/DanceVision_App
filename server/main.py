@@ -1,5 +1,7 @@
 import os
 import subprocess
+from pathlib import Path
+
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -46,6 +48,6 @@ async def upload_video(video: UploadFile = File(...)):
 # Retrieve thumbnail icons.
 @app.get("/thumbnails")
 async def get_thumbnails():
-    thumbnail_dir = os.path.join("uploads", "thumbnails")
+    thumbnail_dir = Path(os.path.join("uploads", "thumbnails"))
     thumbnails = [os.path.join(url, f"{thumbnail_file.name}") for thumbnail_file in thumbnail_dir.iterdir() if thumbnail_file.is_file()]
     return {"thumbnails": thumbnails}
