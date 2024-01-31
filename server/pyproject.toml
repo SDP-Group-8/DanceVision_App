@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dancevision_server"
+version = "0.0.1"
+dependencies = [
+    "fastapi[standard]",
+    "python-multipart"
+]
+
+description = "Package for Pose Estimation"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.scripts]
+
+[project.urls]
+Homepage = "https://github.com/SDP-Group-8/Pose_Tracking"
+Issues = "https://github.com/SDP-Group-8/Pose_Tracking/issues"
