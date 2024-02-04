@@ -15,7 +15,7 @@
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
   transition: all 0.2s ease;
-  animation: slideUp 0.5s ease-out;
+  animation: slideUp 0.5s ease-out forwards;
 }
 
 .video-display:hover {
@@ -47,7 +47,7 @@
 }
 
 .title-wrapper:hover {
-  background: linear-gradient(rgba(0, 0, 0, 0.5), #000);
+  background: linear-gradient(rgba(0, 0, 0, 0), #000);
   opacity: 1;
   cursor: pointer;
 }
