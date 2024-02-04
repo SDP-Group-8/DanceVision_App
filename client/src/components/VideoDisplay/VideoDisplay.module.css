@@ -16,7 +16,7 @@
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
   transition: all 0.2s ease;
-  animation: slideUp 0.5s ease-out forwards;
+  animation: slideUp 0.5s ease-out;
 }
 
 .video-display:hover {
