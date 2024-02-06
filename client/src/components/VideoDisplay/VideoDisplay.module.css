@@ -17,6 +17,7 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
   transition: all 0.2s ease;
   animation: slideUp 0.5s ease-out;
+  flex: 0 0 auto;
 }
 
 .video-display:hover {
