@@ -1,7 +1,8 @@
 import './App.css'
 import { Route, Routes, BrowserRouter as Router} from 'react-router-dom';
 import HomePage from './pages/HomePage.jsx';
-import SelectVideoPage from './pages/SelectVideoPage.jsx';
+
+import SelectVideoPage from './pages/SelectVideoPage/SelectVideoPage.jsx';
 
 function App() {
   return(

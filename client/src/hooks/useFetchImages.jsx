@@ -10,17 +10,10 @@ const useFetchImages = (url, options = {}) => {
     const fetchImagesData = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(url, { responseType: 'arraybuffer', ...options });
-        const imageDataList = response.data;
+        const response = await axios.get(url, { responseType: 'json', ...options });
+        const imageDataList = response.data.thumbnails;
         console.log(imageDataList);
-        const newImages = [];
-        imageDataList.map((imageData) => {
-          const image = {
-            url: URL.createObjectURL(new Blob([imageDataList], { type: 'image/jpeg' })),
-          }
-          newImages.push(image);
-        });
-        setImages(newImages);
+        setImages(imageDataList);
       } catch (error) {
         setError(error);
       } finally {

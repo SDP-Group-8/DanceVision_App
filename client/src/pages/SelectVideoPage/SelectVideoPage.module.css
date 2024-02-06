@@ -1,0 +1,11 @@
+.thumbnail-container {
+  display: flex;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
