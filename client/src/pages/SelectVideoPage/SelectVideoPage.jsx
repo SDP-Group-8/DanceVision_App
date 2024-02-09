@@ -15,7 +15,7 @@ function SelectVideoPage() {
     }
 
     return (
-      <div>
+      <div className={styles.SelectVideoPage}>
         <div className={styles.header}>Select A Dance Video</div>
         <div className={styles["thumbnail-container"]}>
           {images.map((image) => <VideoDisplay key={image} imgUrl={image} title={image}/>)}
