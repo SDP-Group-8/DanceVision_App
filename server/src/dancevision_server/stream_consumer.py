@@ -5,28 +5,31 @@ from aiortc import RTCPeerConnection, RTCSessionDescription
 import asyncio
 import argparse
 
+import cv2
+
 async def create_client(address: str, port: str):
     pc = RTCPeerConnection()
     pc.addTransceiver("video", "recvonly")
+
+    @pc.on("track")
+    async def on_track(track):
+        print("got track")
+        while True:
+            frame = await track.recv()
+            img = frame.to_ndarray(format="yuv420p")
+            cv2.imshow("live_stream", img)
+            cv2.waitKey(1)
+
     async def negotiate():
         await pc.setLocalDescription(await pc.createOffer())
-        # send offer via http
-        offer = pc.localDescription.sdp
         url = f"http://{address}:{port}/offer"
-        x = requests.post(url, data = offer)
-        answer_string = json.loads(x.text)
-        remote_description = RTCSessionDescription(answer_string["answer"], "answer")
+        payload = {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type}
+        response = requests.post(url, data = json.dumps(payload))
+        connection_answer = json.loads(response.text)
+        remote_description = RTCSessionDescription(connection_answer["sdp"], connection_answer["type"])
         await pc.setRemoteDescription(remote_description)
 
-    async def check_connecton():
-        while pc.connectionState != "connected":
-            await asyncio.sleep(1)
-
-        while pc.connectionState == "connected":
-            print("connected")
-            await asyncio.sleep(1)
-
-    await asyncio.gather(negotiate(), check_connecton())
+    await asyncio.gather(negotiate(), asyncio.Event().wait())
 
 def main():
     parser = argparse.ArgumentParser()

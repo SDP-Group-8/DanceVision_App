@@ -16,7 +16,7 @@ from aiortc import RTCPeerConnection, RTCSessionDescription
 from starlette.requests import Request
 import argparse
 
-from dancevision_server.session_description_offer import SessionDescriptionOffer
+from dancevision_server.session_description import SessionDescription
 
 rest_app = FastAPI()
 
@@ -25,12 +25,12 @@ webcam = None
 
 pcs = set()
 
-offer_string = ""
-answer_string =  ""
+connection_offer = None
+connection_answer = None
 
 rest_app.add_middleware(
         CORSMiddleware,
-        allow_origins=['http://localhost:5173'],
+        allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["*"],  
         allow_headers=["*","Content-Type", "Content-Length", "Content-Range"]
@@ -76,7 +76,7 @@ async def get_thumbnails():
     return {"thumbnails": thumbnails}
 
 @rest_app.post("/stream_offer")
-async def stream_offer(offer: SessionDescriptionOffer):
+async def stream_offer(offer: SessionDescription):
     """
     Negotiate a WebRTC connection and send the video track to the consumer
     :return: The SDP and type descriptors for the peer connection
@@ -90,7 +90,7 @@ async def stream_offer(offer: SessionDescriptionOffer):
 
     @pc.on("connectionstatechange")
     async def on_connectionstatechange():
-        print("Connection state is %s" % pc.connectionState)
+        print(f"Connection state is {pc.connectionState}")
         if pc.connectionState == "failed":
             await pc.close()
             pcs.discard(pc)
@@ -115,44 +115,35 @@ async def stream_offer(offer: SessionDescriptionOffer):
     return JSONResponse({"sdp": pc.localDescription.sdp, "type": pc.localDescription.type})
 
 @rest_app.post("/offer")
-async def get_offer(request: Request):
+async def get_offer(offer: SessionDescription):
     """
-    
+    Submits an offer to the server
+    :param offer: the submitted peer connection offer
     """
-    global offer_string
-    global answer_string
-    body = await request.body()
-    offer_string = body.decode('utf-8')
-    while answer_string == "":
+    global connection_offer
+    connection_offer = offer
+    while connection_answer is None:
         await asyncio.sleep(1)
-    return {"answer": answer_string}
+    return JSONResponse({"sdp": connection_answer.sdp, "type": connection_answer.type})
 
 @rest_app.get("/request-offer")
 async def request_offer():
     """
-    
+    Gets the latest offer
+    :return: The latest offer submitted to the server
     """
-    global offer_string
-    return {"offer": offer_string}
+    global connection_offer
+    return JSONResponse({"sdp": connection_offer.sdp, "type": connection_offer.type})
 
 @rest_app.post("/answer")
-async def get_answer(request: Request):
+async def get_answer(answer: SessionDescription):
     """
-    
+    Submits an answer to the server
+    :param answer: the submitted peer connection answer
     """
-    global answer_string
-    global offer_string
-    body = await request.body()
-    answer_string = body.decode('utf-8')
-    return {"offer": offer_string}
-
-@rest_app.get("/reset")
-async def reset():
-    global offer_string
-    global answer_string
-    offer_string = ""
-    answer_string = ""
-    return {"message": "Reset successful"}
+    global connection_answer
+    connection_answer = answer
+    return JSONResponse({"message": "Successfully set answer"})
 
 def main():
     parser = argparse.ArgumentParser()
