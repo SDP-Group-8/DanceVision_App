@@ -11,6 +11,11 @@ from fastapi.responses import JSONResponse
 from aiortc import RTCSessionDescription, RTCPeerConnection
 from aiortc.contrib.media import MediaPlayer, MediaRelay
 
+import asyncio
+from aiortc import RTCPeerConnection, RTCSessionDescription
+from starlette.requests import Request
+import argparse
+
 from dancevision_server.session_description_offer import SessionDescriptionOffer
 
 rest_app = FastAPI()
@@ -19,6 +24,9 @@ relay = None
 webcam = None
 
 pcs = set()
+
+offer_string = ""
+answer_string =  ""
 
 rest_app.add_middleware(
         CORSMiddleware,
@@ -97,7 +105,7 @@ async def stream_offer(offer: SessionDescriptionOffer):
         
     relay = MediaRelay()
     stream = relay.subscribe(webcam.video)
-    video_sender = pc.addTrack(stream)
+    pc.addTrack(stream)
 
     await pc.setRemoteDescription(offer)
 
@@ -106,5 +114,50 @@ async def stream_offer(offer: SessionDescriptionOffer):
 
     return JSONResponse({"sdp": pc.localDescription.sdp, "type": pc.localDescription.type})
 
+@rest_app.post("/offer")
+async def get_offer(request: Request):
+    """
+    
+    """
+    global offer_string
+    global answer_string
+    body = await request.body()
+    offer_string = body.decode('utf-8')
+    while answer_string == "":
+        await asyncio.sleep(1)
+    return {"answer": answer_string}
+
+@rest_app.get("/request-offer")
+async def request_offer():
+    """
+    
+    """
+    global offer_string
+    return {"offer": offer_string}
+
+@rest_app.post("/answer")
+async def get_answer(request: Request):
+    """
+    
+    """
+    global answer_string
+    global offer_string
+    body = await request.body()
+    answer_string = body.decode('utf-8')
+    return {"offer": offer_string}
+
+@rest_app.get("/reset")
+async def reset():
+    global offer_string
+    global answer_string
+    offer_string = ""
+    answer_string = ""
+    return {"message": "Reset successful"}
+
 def main():
-    uvicorn.run(rest_app)
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--address", dest="address")
+    args = parser.parse_args()
+
+    uvicorn.run(rest_app, host=args.address)
