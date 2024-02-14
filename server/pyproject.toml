@@ -20,6 +20,7 @@ classifiers = [
 ]
 
 [project.scripts]
+rest-api = "dancevision_server.rest_server:main"
 
 [project.urls]
 Homepage = "https://github.com/SDP-Group-8/Pose_Tracking"
