@@ -4,14 +4,15 @@ import styles from './DanceScreen.module.css';
 import {useRef} from 'react'
 
 const DanceScreen = (props) => {
-  const {videoSource, isVideoAvailable} = useVideoFeed('http://localhost:8000/stream_offer');
+  const {videoSource, isVideoAvailable} = useVideoFeed(import.meta.env.VITE_API_URL);
 
   const videos = useRef(new MediaStream())
   videos.current.srcObject = videoSource;
 
   return (
-    <video ref={videos} autoPlay width="100%">
-    </video>
+    <div>
+      <video ref={videos} autoPlay width="100%"></video>
+    </div>
   );
 }
 

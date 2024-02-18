@@ -4,29 +4,22 @@ import subprocess
 import os
 from pathlib import Path
 import uvicorn
+import logging
 
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, status
 from fastapi.responses import JSONResponse
 
-from aiortc import RTCSessionDescription, RTCPeerConnection
-from aiortc.contrib.media import MediaPlayer, MediaRelay
-
 import asyncio
-from aiortc import RTCPeerConnection, RTCSessionDescription
-from starlette.requests import Request
 import argparse
 
 from dancevision_server.session_description import SessionDescription
 
 rest_app = FastAPI()
 
-relay = None
-webcam = None
+connection_offers = {}
+connection_answers = {}
 
-pcs = set()
-
-connection_offer = None
-connection_answer = None
+logger = logging.Logger("rest_server")
 
 rest_app.add_middleware(
         CORSMiddleware,
@@ -75,65 +68,33 @@ async def get_thumbnails():
     thumbnails = [os.path.join(f"{thumbnail_file.name}") for thumbnail_file in thumbnail_dir.iterdir() if thumbnail_file.is_file()]
     return {"thumbnails": thumbnails}
 
-@rest_app.post("/stream_offer")
-async def stream_offer(offer: SessionDescription):
-    """
-    Negotiate a WebRTC connection and send the video track to the consumer
-    :return: The SDP and type descriptors for the peer connection
-    """
-    global relay, webcam
-
-    offer = RTCSessionDescription(sdp=offer.sdp, type=offer.type)
-
-    pc = RTCPeerConnection()
-    pcs.add(pc)
-
-    @pc.on("connectionstatechange")
-    async def on_connectionstatechange():
-        print(f"Connection state is {pc.connectionState}")
-        if pc.connectionState == "failed":
-            await pc.close()
-            pcs.discard(pc)
-
-    
-    options = {"framerate": "30", "video_size": "640x480"}
-    
-    if webcam is None:
-        webcam = MediaPlayer(
-            "/dev/video0", format="v4l2", options=options
-        )
-        
-    relay = MediaRelay()
-    stream = relay.subscribe(webcam.video)
-    pc.addTrack(stream)
-
-    await pc.setRemoteDescription(offer)
-
-    answer = await pc.createAnswer()
-    await pc.setLocalDescription(answer)
-
-    return JSONResponse({"sdp": pc.localDescription.sdp, "type": pc.localDescription.type})
-
 @rest_app.post("/offer")
 async def get_offer(offer: SessionDescription):
     """
     Submits an offer to the server
     :param offer: the submitted peer connection offer
     """
-    global connection_offer
-    connection_offer = offer
-    while connection_answer is None:
-        await asyncio.sleep(1)
-    return JSONResponse({"sdp": connection_answer.sdp, "type": connection_answer.type})
+    global connection_offers
+    connection_offers[offer.host_id] = offer
+    return JSONResponse({"message": "Successfully set offer"})
 
 @rest_app.get("/request-offer")
-async def request_offer():
+async def request_offer(host_id: str):
     """
-    Gets the latest offer
+    Gets the latest offer submitted with the identifier
+    :param host_id: Host identifier for peer connection
     :return: The latest offer submitted to the server
     """
-    global connection_offer
-    return JSONResponse({"sdp": connection_offer.sdp, "type": connection_offer.type})
+    global connection_offers
+    if host_id in connection_offers:
+        return JSONResponse(
+            {
+                "sdp": connection_offers[host_id].sdp,
+                "type": connection_offers[host_id].type
+            }
+        )
+    else:
+        return JSONResponse("", status_code=status.HTTP_409_CONFLICT)
 
 @rest_app.post("/answer")
 async def get_answer(answer: SessionDescription):
@@ -141,9 +102,28 @@ async def get_answer(answer: SessionDescription):
     Submits an answer to the server
     :param answer: the submitted peer connection answer
     """
-    global connection_answer
-    connection_answer = answer
+    global connection_answers
+    connection_answers[answer.host_id] = answer
     return JSONResponse({"message": "Successfully set answer"})
+
+@rest_app.get("/request-answer")
+async def request_answer(host_id: str):
+    """
+    Gets the latest answer submitted with the identifier
+    :param host_id: Host identifier for peer connection
+    :return: The latest answer submitted to the server
+    """
+    global connection_offers
+    if host_id in connection_answers:
+        return JSONResponse(
+            {
+                "sdp": connection_answers[host_id].sdp,
+                "type": connection_answers[host_id].type
+            }
+        )
+    else:
+        return JSONResponse("", status_code=status.HTTP_409_CONFLICT)
+
 
 def main():
     parser = argparse.ArgumentParser()

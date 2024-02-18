@@ -10,7 +10,7 @@ const useFetchImages = (url, options = {}) => {
     const fetchImagesData = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get(url, { responseType: 'json', ...options });
+        const response = await axios.get(url + "/thumbnails", { responseType: 'json', ...options });
         const imageDataList = response.data.thumbnails;
         console.log(imageDataList);
         setImages(imageDataList);

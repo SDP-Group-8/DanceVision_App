@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { useState, useEffect} from 'react';
 
+const SERVER_IDENTIFER = "server"
+
 const useVideoFeed = (url, options = {}) => {
     const [videoSource, setVideoSource] = useState(new MediaStream());
     const [isVideoAvailable, setVideoAvailable] = useState(false);
@@ -38,16 +40,36 @@ const useVideoFeed = (url, options = {}) => {
                     pc.addEventListener('icegatheringstatechange', checkState);
                 }
             });
-    
-            const axios1 = axios.create({
-                baseURL: 'http://localhost:8000'
-            });
         
-            const payload = {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type}
+            const payload = {
+                "sdp": pc.localDescription.sdp,
+                "type": pc.localDescription.type,
+                "host_id": "server"
+            }
     
+            const getAnswer = async () => {
+                let connection_answer = null;
+
+                while (connection_answer === null) {
+                    try {
+                        const res = await axios.get(url + "/request-answer?" + new URLSearchParams({"host_id": SERVER_IDENTIFER}))
+                        connection_answer = res.data
+                    } catch {
+                        await new Promise(r => setTimeout(r, 2000))
+                    }
+                }
+                
+                return connection_answer
+            }
+
             try {
-                const response = await axios1.post('/stream_offer', payload);
-                pc.setRemoteDescription(response.data);
+                const axios1 = axios.create({
+                    baseURL: url
+                });
+
+                await axios1.post('/offer', payload);
+                const connection_answer = await getAnswer()
+                pc.setRemoteDescription(connection_answer);
             } catch (error) {
                 console.error(error);
             }

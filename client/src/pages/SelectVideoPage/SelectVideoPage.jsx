@@ -4,7 +4,7 @@ import styles from "./SelectVideoPage.module.css";
 import VideoDisplay from "../../components/VideoDisplay/VideoDisplay";
 
 function SelectVideoPage() {
-    const { images, isLoading, error } = useFetchImages('http://localhost:8000/thumbnails');
+    const { images, isLoading, error } = useFetchImages(import.meta.env.VITE_API_URL);
 
     if (isLoading) {
       return <p>Loading images...</p>;
