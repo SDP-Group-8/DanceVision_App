@@ -21,7 +21,11 @@ classifiers = [
 
 [project.scripts]
 rest-api = "dancevision_server.rest_server:main"
+backend = "dancevision_server.websocket_server:run_socket_and_app"
 video-consumer = "dancevision_server.stream_consumer:main"
+video-relay = "dancevision_server.stream_relay:main"
+video-comparison = "dancevision_server.stream_comparison:main"
+video-sender = "dancevision_server.stream_sender:main"
 
 [project.urls]
 Homepage = "https://github.com/SDP-Group-8/DanceVision_App"
