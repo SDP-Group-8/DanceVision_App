@@ -1,0 +1,7 @@
+{
+    "manifest_version": 2,
+    "permissions": [
+      "chrome.app.commandLine"
+    ]
+  }
+  
