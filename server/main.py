@@ -4,18 +4,28 @@ from pathlib import Path
 from fastapi.responses import FileResponse
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from mediapipe import solutions
+from pose_estimation.mediapipe import MediaPipe
+from argparse import ArgumentParser
 
 app = FastAPI()
-url = 'http://localhost:8000'
 
-origins = [
-    'http://localhost:5173'
-]
+parser = ArgumentParser()
+parser.add_argument("--port", type=int, default="8000")
+parser.add_argument("--host", type=str, default="localhost")
+
+args = parser.parse_args()
+port = args.port
+host = args.host
+print(port)
+print(host)
+url = f"http://{host}:{port}/"
+
 
 # Handle origin permissions
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],  
     allow_headers=["*","Content-Type", "Content-Length", "Content-Range"]
@@ -64,3 +74,10 @@ async def get_thumbnail(filename: str):
 
     # Return the file as a response
     return FileResponse(file_path, media_type="image/jpeg")  # Adjust media_type as needed
+
+# Run the server
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host=host, port=port)
+    # start the webcam consumer
+    subprocess.Popen(["python3", "webcam_consumer.py", f"--host={host}", f"--port={port}"])

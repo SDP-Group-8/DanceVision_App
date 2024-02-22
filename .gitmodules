@@ -1,0 +1,3 @@
+[submodule "Pose_Tracking"]
+	path = Pose_Tracking
+	url = https://github.com/SDP-Group-8/Pose_Tracking.git
