@@ -1,18 +1,11 @@
 var peer = null;
 let sdp = "";
-var url = "";
-chrome.app.commandLine.getSwitchValue('url', function(value) {
-    if (result) {
-        url = value;
-        console.log(url);
-    }
-    else {
-        console.log("failed to find url")
-    }
-})
+const queryString=window.location.search;
+const urlParams = new URLSearchParams(queryString);
+const host_port = urlParams.get('url');
+const url = "http://" + host_port + "/";
 
-
-fetch("http://127.0.0.1:8083/request-offer",
+fetch(url + "request-offer",
 {
     method: "get",
     headers: {
@@ -144,7 +137,7 @@ async function waitToCompleteIceGathering(pc, logPerformance) {
 
 function sendAnswerToBrowser(answerSDP) {
     console.log('sendAnswerToBrowser')
-    fetch("http://127.0.0.1:8083/answer", {
+    fetch(url + "answer", {
         method: "post",
         headers: {
             'Content-Type': 'text/plain'
