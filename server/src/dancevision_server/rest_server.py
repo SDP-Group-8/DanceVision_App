@@ -1,21 +1,32 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import subprocess
+import signal
 import os
-from pathlib import Path
 import uvicorn
 import logging
+from multiprocessing import Process
+import asyncio
 
+from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, File, UploadFile, status
 from fastapi.responses import JSONResponse
 
-import asyncio
 import argparse
 
 from dancevision_server.session_description import SessionDescription
+from dancevision_server.video_saver import VideoSaver
+from dancevision_server.stream_comparison import StreamComparison
+from dancevision_server.environment import model_var_name
+from dancevision_server.thumbnail_info import ThumbnailInfo
+from dancevision_server.stream_sender import StreamSender
 
 rest_app = FastAPI()
 
+address = None
+port = None
+only_send = False
+
+process = None
 connection_offers = {}
 connection_answers = {}
 
@@ -37,25 +48,44 @@ async def upload_video(video: UploadFile = File(...)):
     :param video: The video sent in a post request
     :return: Successfull response or error message
     """
-    file_data = video.file.read()
-    file_size = len(file_data)
-    
-    if video.content_type not in ('video/mp4', 'video/x-msvideo'):
-        return {"message": "Invalid file format"}
-    if file_size > (300 * pow(1024, 2)):  # 300 MB
-        return {"message": "File size too large"}
+    video_saver = VideoSaver(video)
+    valid = video_saver.validate()
+    if valid is not None:
+        return valid
 
-    destination_path = os.path.join("uploads", video.filename)
-    os.makedirs(os.path.dirname(destination_path), exist_ok=True)
-
-    with open(destination_path, "wb") as f:
-        f.write(file_data)
-
-    # generate thumbnail
-    img_output_path = os.path.join("uploads", "thumbnails", video.filename[0:-4], ".jpg")
-    subprocess.call(['ffmpeg', '-i', destination_path, '-ss', '00:00:00.000', '-vframes', '1', img_output_path])
+    video_saver.save_video()
+    video_saver.generate_thumbnail()
+    video_saver.save_keypoints()
 
     return {"message": "File uploaded successfully"} 
+
+@rest_app.get("/start-video")
+async def start_video(video_name: str):
+    global address
+    global port
+    global only_send
+    global process
+    
+    """
+    Start the main comparison screen with the selected video
+    :param video_name: name of the video file
+    """
+    if process is not None:
+        process.kill()
+    
+    filepath = VideoSaver.get_video_filepath(video_name)
+
+    model_path = os.environ[model_var_name]
+    args = {"address": address, "port": port, "video_path": str(filepath)}
+    comparison = \
+        StreamSender(**args) if only_send else StreamComparison(parameter_path = model_path, **args)
+
+    run_comparison = lambda: asyncio.run(comparison.run())
+
+    process = Process(None, run_comparison)
+    process.start()
+
+    return JSONResponse({"message": "Successfully created streaming client"})
 
 # Retrieve thumbnail icons.
 @rest_app.get("/thumbnails")
@@ -64,9 +94,9 @@ async def get_thumbnails():
     Get thumbnails from the filesystem
     :return: A list of all thumbnail names
     """
-    thumbnail_dir = Path(os.path.join("uploads", "thumbnails"))
-    thumbnails = [os.path.join(f"{thumbnail_file.name}") for thumbnail_file in thumbnail_dir.iterdir() if thumbnail_file.is_file()]
-    return {"thumbnails": thumbnails}
+    videos_dir = VideoSaver.get_video_directory()
+    names = (ThumbnailInfo(video_file) for video_file in videos_dir.iterdir() if video_file.is_file())
+    return {"thumbnails": [thumbnail.to_dict() for thumbnail in names]}
 
 @rest_app.post("/offer")
 async def get_offer(offer: SessionDescription):
@@ -126,9 +156,29 @@ async def request_answer(host_id: str):
 
 
 def main():
+    global address
+    global port
+    global only_send
+    global process
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--address", dest="address")
+    parser.add_argument("--port", dest="port")
+    parser.add_argument("--only-send", dest="only_send", action="store_true")
     args = parser.parse_args()
 
-    uvicorn.run(rest_app, host=args.address)
+    address = args.address
+    port = args.port
+    only_send = args.only_send
+
+    thumbnails_dir = VideoSaver.get_video_directory()
+    rest_app.mount("/thumbnails", StaticFiles(directory=thumbnails_dir / "thumbnails"))
+    uvicorn.run(rest_app, host=args.address, port=int(args.port))
+
+    def signal_handler(sig, frame):
+        if process is not None:
+            process.kill()
+
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.pause()
