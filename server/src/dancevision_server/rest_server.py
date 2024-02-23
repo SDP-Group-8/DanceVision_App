@@ -14,6 +14,7 @@ import argparse
 from dancevision_server.session_description import SessionDescription
 from dancevision_server.video_saver import VideoSaver
 from dancevision_server.stream_comparison import StreamComparison
+from dancevision_server.local_stream_comparison import LocalStreamComparison
 from dancevision_server.environment import model_var_name
 from dancevision_server.thumbnail_info import ThumbnailInfo
 from dancevision_server.stream_sender import StreamSender
@@ -23,7 +24,9 @@ rest_app = FastAPI()
 
 address = None
 port = None
+debug = False
 only_send = False
+
 pcs = set()
 
 comparison = None
@@ -63,6 +66,7 @@ async def upload_video(video: UploadFile = File(...)):
 async def start_video(video_name: str):
     global address
     global port
+    global debug
     global only_send
     global comparison
     
@@ -73,15 +77,33 @@ async def start_video(video_name: str):
     filepath = VideoSaver.get_video_filepath(video_name)
 
     model_path = os.environ[model_var_name]
-    args = {"address": address, "port": port, "video_path": str(filepath)}
-    comparison = \
-        StreamSender(**args) if only_send else StreamComparison(parameter_path = model_path, **args)
+    args = {"file": str(filepath)}
 
-    while SERVER_IDENTIFIER not in connection_offers:
-        await asyncio.sleep(2)
-    
-    answer = await comparison.run(connection_offers[SERVER_IDENTIFIER])
-    connection_answers[SERVER_IDENTIFIER] = answer
+    if only_send:
+        sender = StreamSender(**args)
+
+        while SERVER_IDENTIFIER not in connection_offers:
+            await asyncio.sleep(2)
+
+        answer = await sender.run(connection_offers[SERVER_IDENTIFIER])
+        connection_answers[SERVER_IDENTIFIER] = answer
+
+    elif debug:
+        sender = StreamSender(**args)
+
+        while SERVER_IDENTIFIER not in connection_offers:
+            await asyncio.sleep(2)
+
+        offer = connection_offers[SERVER_IDENTIFIER]
+        comparison = LocalStreamComparison(parameter_path = model_path, video_path=str(filepath), offer=offer)
+
+        await comparison.start_receiver(sender.run)
+        connection_answers[SERVER_IDENTIFIER] = await comparison.get_answer()
+        
+    else:
+        args.update({"address": address, "port": port})
+        comparison = StreamComparison(parameter_path = model_path, **args)
+        comparison.run()
 
     return JSONResponse({"message": "Successfully created streaming client"})
 
@@ -156,17 +178,20 @@ async def request_answer(host_id: str):
 def main():
     global address
     global port
+    global debug
     global only_send
 
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--address", dest="address")
     parser.add_argument("--port", dest="port")
+    parser.add_argument("--debug", dest="debug", action="store_true")
     parser.add_argument("--only-send", dest="only_send", action="store_true")
     args = parser.parse_args()
 
     address = args.address
     port = args.port
+    debug = args.debug
     only_send = args.only_send
 
     thumbnails_dir = VideoSaver.get_video_directory()

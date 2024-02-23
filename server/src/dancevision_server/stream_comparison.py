@@ -1,6 +1,4 @@
 import asyncio
-import argparse
-import os
 
 from aiortc import RTCPeerConnection
 from aiortc.contrib.media import MediaRelay

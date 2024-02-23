@@ -70,6 +70,18 @@ class PeerConnnection:
         await pc.setRemoteDescription(remote_description)
 
     @staticmethod
+    async def negotiate_local_receiver(pc: RTCPeerConnection, get_answer):
+        """
+        Negotiate a peer connection to receive video
+        :param pc: uninitialized peer connection object
+        :param get_answer: coroutine to retrieve the answer
+        """
+        offer = await pc.createOffer()
+        await pc.setLocalDescription(offer)
+        answer = await get_answer(offer)
+        await pc.setRemoteDescription(answer)
+
+    @staticmethod
     async def negotiate_sender(pc: RTCPeerConnection, address: str, port: int, host_id: str = SERVER_IDENTIFIER):
         """
         Negotiate a peer connection to send video
@@ -80,7 +92,7 @@ class PeerConnnection:
         """
         connection_offer = await PeerConnnection.__get_session_description("request-offer", host_id, address, port)
         offer = RTCSessionDescription(sdp=connection_offer["sdp"], type=connection_offer["type"])
-        PeerConnnection.negotiate_local_sender()
+        PeerConnnection.negotiate_local_sender(offer)
         PeerConnnection.__post_session_description("answer", pc.localDescription, host_id, address, port)
 
     @staticmethod

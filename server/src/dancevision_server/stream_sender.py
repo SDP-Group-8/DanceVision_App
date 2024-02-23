@@ -11,19 +11,12 @@ relay = MediaRelay()
 
 class StreamSender:
 
-    def __init__(self, address: str, port: str, video_path: str):
+    def __init__(self, **kwargs):
         global relay
-        global player
 
         self.emitter_pc = RTCPeerConnection()
-
-        self.address = address
-        self.port = port
-
-        player = MediaPlayer(video_path)
-
-        relay = MediaRelay()
+        player = MediaPlayer(**kwargs)
         self.emitter_pc.addTrack(relay.subscribe(player.video))
 
-    def run(self, offer):
-        return PeerConnnection.negotiate_local_sender(self.emitter_pc, offer)
+    async def run(self, offer):
+        return await PeerConnnection.negotiate_local_sender(self.emitter_pc, offer)
