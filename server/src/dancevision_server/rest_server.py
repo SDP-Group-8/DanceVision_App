@@ -1,10 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import signal
 import os
 import uvicorn
 import logging
-from multiprocessing import Process
 import asyncio
 
 from fastapi.staticfiles import StaticFiles
@@ -19,14 +17,16 @@ from dancevision_server.stream_comparison import StreamComparison
 from dancevision_server.environment import model_var_name
 from dancevision_server.thumbnail_info import ThumbnailInfo
 from dancevision_server.stream_sender import StreamSender
+from dancevision_server.host_identifiers import SERVER_IDENTIFIER
 
 rest_app = FastAPI()
 
 address = None
 port = None
 only_send = False
+pcs = set()
 
-process = None
+comparison = None
 connection_offers = {}
 connection_answers = {}
 
@@ -64,15 +64,12 @@ async def start_video(video_name: str):
     global address
     global port
     global only_send
-    global process
+    global comparison
     
     """
     Start the main comparison screen with the selected video
     :param video_name: name of the video file
     """
-    if process is not None:
-        process.kill()
-    
     filepath = VideoSaver.get_video_filepath(video_name)
 
     model_path = os.environ[model_var_name]
@@ -80,10 +77,11 @@ async def start_video(video_name: str):
     comparison = \
         StreamSender(**args) if only_send else StreamComparison(parameter_path = model_path, **args)
 
-    run_comparison = lambda: asyncio.run(comparison.run())
-
-    process = Process(None, run_comparison)
-    process.start()
+    while SERVER_IDENTIFIER not in connection_offers:
+        await asyncio.sleep(2)
+    
+    answer = await comparison.run(connection_offers[SERVER_IDENTIFIER])
+    connection_answers[SERVER_IDENTIFIER] = answer
 
     return JSONResponse({"message": "Successfully created streaming client"})
 
@@ -159,7 +157,6 @@ def main():
     global address
     global port
     global only_send
-    global process
 
     parser = argparse.ArgumentParser()
 
@@ -175,10 +172,3 @@ def main():
     thumbnails_dir = VideoSaver.get_video_directory()
     rest_app.mount("/thumbnails", StaticFiles(directory=thumbnails_dir / "thumbnails"))
     uvicorn.run(rest_app, host=args.address, port=int(args.port))
-
-    def signal_handler(sig, frame):
-        if process is not None:
-            process.kill()
-
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.pause()
