@@ -14,7 +14,6 @@ from pose_estimation.mediapipe import MediaPipe
 
 from dancevision_server.host_identifiers import RASPBERRY_PI_IDENTIFIER, SERVER_IDENTIFIER
 from dancevision_server.pose_detection_track import PoseDetectionTrack
-from dancevision_server.websocket_server import emit_keypoints
 
 relay = MediaRelay()
 
