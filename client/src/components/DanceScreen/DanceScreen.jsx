@@ -4,17 +4,18 @@ import styles from './DanceScreen.module.css';
 import {useRef} from 'react'
 
 const DanceScreen = (props) => {
-  const {liveVideoSource, isVideoAvailable} = useVideoFeed(import.meta.env.VITE_API_URL);
+  const {liveVideoSource, recordedVideoSource, isVideoAvailable} = useVideoFeed(import.meta.env.VITE_API_URL);
 
-  console.log(isVideoAvailable)
-  console.log(liveVideoSource)
+  const liveVideos = useRef(new MediaStream())
+  const recordedVideos = useRef(new MediaStream())
 
-  const videos = useRef(new MediaStream())
-  videos.current.srcObject = liveVideoSource;
+  liveVideos.current.srcObject = liveVideoSource;
+  recordedVideos.current.srcObject = recordedVideoSource;
 
   return (
     <div>
-      <video ref={videos} autoPlay width="100%"></video>
+      <video ref={liveVideos} autoPlay width="100%"></video>
+      <video ref={recordedVideos} autoPlay width="100%"></video>
     </div>
   );
 }

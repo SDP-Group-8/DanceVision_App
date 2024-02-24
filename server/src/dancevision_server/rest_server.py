@@ -14,7 +14,6 @@ import argparse
 from dancevision_server.session_description import SessionDescription
 from dancevision_server.video_saver import VideoSaver
 from dancevision_server.stream_comparison import StreamComparison
-from dancevision_server.local_stream_comparison import LocalStreamComparison
 from dancevision_server.environment import model_var_name
 from dancevision_server.thumbnail_info import ThumbnailInfo
 from dancevision_server.stream_sender import StreamSender
@@ -25,7 +24,9 @@ rest_app = FastAPI()
 address = None
 port = None
 debug = False
+
 only_send = False
+file = None
 
 pcs = set()
 
@@ -66,9 +67,8 @@ async def upload_video(video: UploadFile = File(...)):
 async def start_video(video_name: str):
     global address
     global port
-    global debug
     global only_send
-    global comparison
+    global file
     
     """
     Start the main comparison screen with the selected video
@@ -86,20 +86,8 @@ async def start_video(video_name: str):
             await asyncio.sleep(2)
 
         answer = await sender.run(connection_offers[SERVER_IDENTIFIER])
+        sender.add_second_track(file=file)
         connection_answers[SERVER_IDENTIFIER] = answer
-
-    elif debug:
-        sender = StreamSender(**args)
-
-        while SERVER_IDENTIFIER not in connection_offers:
-            await asyncio.sleep(2)
-
-        offer = connection_offers[SERVER_IDENTIFIER]
-        comparison = LocalStreamComparison(parameter_path = model_path, video_path=str(filepath), offer=offer)
-
-        await comparison.start_receiver(sender.run)
-        connection_answers[SERVER_IDENTIFIER] = await comparison.get_answer()
-        
     else:
         args.update({"address": address, "port": port})
         comparison = StreamComparison(parameter_path = model_path, **args)
@@ -179,7 +167,9 @@ def main():
     global address
     global port
     global debug
+
     global only_send
+    global file
 
     parser = argparse.ArgumentParser()
 
@@ -187,12 +177,18 @@ def main():
     parser.add_argument("--port", dest="port")
     parser.add_argument("--debug", dest="debug", action="store_true")
     parser.add_argument("--only-send", dest="only_send", action="store_true")
+    parser.add_argument("--file", dest="file")
     args = parser.parse_args()
 
     address = args.address
     port = args.port
     debug = args.debug
+
+    if (args.only_send == True) != (args.file is not None):
+        raise ValueError("You must set both the --only-send and --file options")
+
     only_send = args.only_send
+    file = args.file
 
     thumbnails_dir = VideoSaver.get_video_directory()
     rest_app.mount("/thumbnails", StaticFiles(directory=thumbnails_dir / "thumbnails"))

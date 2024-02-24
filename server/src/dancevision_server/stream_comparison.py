@@ -13,7 +13,7 @@ relay = MediaRelay()
 
 class StreamComparison:
 
-    def __init__(self, address: str, port: str, parameter_path: str, video_path: str):
+    def __init__(self, address: str, port: str, parameter_path: str, **kwargs):
         self.receiver_pc = RTCPeerConnection()
         self.receiver_pc.addTransceiver("video", "recvonly")
 
@@ -29,7 +29,7 @@ class StreamComparison:
         async def on_track(track):
             score_channel = self.emitter_pc.createDataChannel("score")
 
-            player = MediaPlayer(video_path)
+            player = MediaPlayer(**kwargs)
             self.emitter_pc.addTrack(player.video)
 
             self.emitter_pc.addTrack(

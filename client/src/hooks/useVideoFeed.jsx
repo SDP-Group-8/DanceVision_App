@@ -17,13 +17,20 @@ const useVideoFeed = (url, options = {}) => {
     useEffect(() => {
         const getVideoStream = async () => {
             pc.addTransceiver('video', { direction: 'recvonly' });
+            pc.addTransceiver('video', { direction: 'recvonly' });
+
             const offer = await pc.createOffer()
             pc.setLocalDescription(offer);
             
             pc.addEventListener('track', (evt) => {
                 if (evt.track.kind == 'video') {
-                    setLiveVideoSource(evt.streams[0]);
-                    setVideoAvailable(true);
+                    if(evt.transceiver.mid === "0"){
+                        setLiveVideoSource(new MediaStream([evt.track]));
+                    }else if(evt.transceiver.mid === "1"){
+                        setRecordedVideoSource(new MediaStream([evt.track]));
+                    }
+
+                    setVideoAvailable(true);                    
                 }
             });
 
@@ -78,7 +85,7 @@ const useVideoFeed = (url, options = {}) => {
         getVideoStream();
     }, [])
 
-    return {liveVideoSource, isVideoAvailable}
+    return {liveVideoSource, recordedVideoSource, isVideoAvailable}
 }
 
 export default useVideoFeed;
