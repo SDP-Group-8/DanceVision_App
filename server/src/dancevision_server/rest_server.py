@@ -104,6 +104,14 @@ async def get_thumbnails():
     names = (ThumbnailInfo(video_file) for video_file in videos_dir.iterdir() if video_file.is_file())
     return {"thumbnails": [thumbnail.to_dict() for thumbnail in names]}
 
+@rest_app.get("/detailed_scores")
+async def get_detailed_scores():
+    """
+    Return detailed scores and information about frames compared so far
+    :return A list of scores for each Keypoint statistics
+    """
+    return {"shoulder": [10,20,30,40,50,60]}
+
 @rest_app.post("/offer")
 async def get_offer(offer: SessionDescription):
     """

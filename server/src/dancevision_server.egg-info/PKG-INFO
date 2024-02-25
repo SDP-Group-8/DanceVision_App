@@ -1,0 +1,26 @@
+Metadata-Version: 2.1
+Name: dancevision_server
+Version: 0.0.1
+Summary: Package for Pose Estimation
+Project-URL: Homepage, https://github.com/SDP-Group-8/DanceVision_App
+Project-URL: Issues, https://github.com/SDP-Group-8/DanceVision_App/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi[standard]
+Requires-Dist: python-multipart
+
+# dancevision_server
+Server backend for the dancevision app
+
+# Quick Startup
+
+1. Install uvicorn
+2. Install the project locally
+
+```
+pip install --editable .
+uvicorn main:app --reload
+```
