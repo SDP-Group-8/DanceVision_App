@@ -28,8 +28,6 @@ debug = False
 only_send = False
 file = None
 
-pcs = set()
-
 comparison = None
 connection_offers = {}
 connection_answers = {}
