@@ -1,7 +1,0 @@
-[console_scripts]
-backend = dancevision_server.websocket_server:run_socket_and_app
-rest-api = dancevision_server.rest_server:main
-video-comparison = dancevision_server.stream_comparison:main
-video-consumer = dancevision_server.stream_consumer:main
-video-relay = dancevision_server.stream_relay:main
-video-sender = dancevision_server.stream_sender:main
