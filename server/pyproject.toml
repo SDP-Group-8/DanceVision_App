@@ -20,7 +20,9 @@ classifiers = [
 ]
 
 [project.scripts]
+rest-api = "dancevision_server.rest_server:main"
+video-consumer = "dancevision_server.stream_consumer:main"
 
 [project.urls]
-Homepage = "https://github.com/SDP-Group-8/Pose_Tracking"
-Issues = "https://github.com/SDP-Group-8/Pose_Tracking/issues"
+Homepage = "https://github.com/SDP-Group-8/DanceVision_App"
+Issues = "https://github.com/SDP-Group-8/DanceVision_App/issues"
