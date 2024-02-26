@@ -11,9 +11,19 @@ const useDetailedScore = (url, options = {}) => {
       try {
         setIsLoading(true);
         const response = await axios.get(url + "/detailed_scores", { responseType: 'json', ...options });
-        const shoulderScore = response.data.shoulder;
-        console.log(shoulderScore);
-        setScore(shoulderScore);
+        const r_shoulder_l_shoulder_l_elbow = response.data.r_shoulder_l_shoulder_l_elbow;
+        console.log(r_shoulder_l_shoulder_l_elbow);
+        setScore(scores => [
+          ...scores, 
+          {"r_shoulder_l_shoulder_l_elbow": response.data.r_shoulder_l_shoulder_l_elbow},
+          {"l_shoulder_l_elbow_l_wrist" : response.data.l_shoulder_l_elbow_l_wrist},
+          {"l_shoulder_r_shoulder_r_elbow": response.data.l_shoulder_r_shoulder_r_elbow},
+          {"r_shoulder_r_elbow_r_wrist": response.data.r_shoulder_r_elbow_r_wrist},
+          {"r_hip_l_hip_l_knee": response.data.r_hip_l_hip_l_knee},
+          {"l_hip_l_knee_l_ankle": response.data.l_hip_l_knee_l_ankle},
+          {"l_hip_r_hip_r_knee": response.data.l_hip_r_hip_r_knee},
+          {"r_hip_r_knee_r_ankle": response.data.r_hip_r_knee_r_ankle}
+        ]);
       } catch (error) {
         setError(error);
       } finally {
@@ -23,12 +33,6 @@ const useDetailedScore = (url, options = {}) => {
     fetchScoreData();
   }, []);
 
-  // const revokeImageUrls = () => {
-  //   images.forEach((image) => URL.revokeObjectURL(image.url));
-  // };
-
-  // // Cleanup function to avoid memory leaks
-  // useEffect(() => () => revokeImageUrls(), [images]);
   return { score, isLoading, error  };
 };
 
