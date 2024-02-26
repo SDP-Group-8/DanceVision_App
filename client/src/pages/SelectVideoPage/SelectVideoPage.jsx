@@ -6,6 +6,8 @@ import VideoDisplay from "../../components/VideoDisplay/VideoDisplay";
 function SelectVideoPage() {
     const { images, isLoading, error } = useFetchImages(import.meta.env.VITE_API_URL);
 
+    console.log(images)
+
     if (isLoading) {
       return <p>Loading images...</p>;
     }
@@ -18,7 +20,13 @@ function SelectVideoPage() {
       <div className={styles.SelectVideoPage}>
         <div className={styles.header}>Select A Dance Video</div>
         <div className={styles["thumbnail-container"]}>
-          {images.map((image) => <VideoDisplay key={image} imgUrl={image} title={image}/>)}
+          {images.map((image) => 
+            <VideoDisplay 
+              key={image.basename}
+              imgUrl={image.thumbnail_filename}
+              title={image.basename}
+              videoName={image.video_filename}
+            />)}
         </div>
        
       </div>
