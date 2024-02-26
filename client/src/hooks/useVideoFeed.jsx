@@ -4,8 +4,7 @@ import { useState, useEffect} from 'react';
 const SERVER_IDENTIFER = "server"
 
 const useVideoFeed = (url, options = {}) => {
-    const [liveVideoSource, setLiveVideoSource] = useState(new MediaStream());
-    const [recordedVideoSource, setRecordedVideoSource] = useState(new MediaStream());
+    const [videoSource, setVideoSource] = useState(new MediaStream());
     const [isVideoAvailable, setVideoAvailable] = useState(false);
     
     var config = {
@@ -17,20 +16,13 @@ const useVideoFeed = (url, options = {}) => {
     useEffect(() => {
         const getVideoStream = async () => {
             pc.addTransceiver('video', { direction: 'recvonly' });
-            pc.addTransceiver('video', { direction: 'recvonly' });
-
             const offer = await pc.createOffer()
             pc.setLocalDescription(offer);
             
             pc.addEventListener('track', (evt) => {
                 if (evt.track.kind == 'video') {
-                    if(evt.transceiver.mid === "0"){
-                        setLiveVideoSource(new MediaStream([evt.track]));
-                    }else if(evt.transceiver.mid === "1"){
-                        setRecordedVideoSource(new MediaStream([evt.track]));
-                    }
-
-                    setVideoAvailable(true);                    
+                    setVideoSource(evt.streams[0]);
+                    setVideoAvailable(true);
                 }
             });
 
@@ -52,7 +44,7 @@ const useVideoFeed = (url, options = {}) => {
             const payload = {
                 "sdp": pc.localDescription.sdp,
                 "type": pc.localDescription.type,
-                "host_id": SERVER_IDENTIFER
+                "host_id": "server"
             }
     
             const getAnswer = async () => {
@@ -85,7 +77,7 @@ const useVideoFeed = (url, options = {}) => {
         getVideoStream();
     }, [])
 
-    return {liveVideoSource, recordedVideoSource, isVideoAvailable}
+    return {videoSource, isVideoAvailable}
 }
 
 export default useVideoFeed;

@@ -1,26 +1,15 @@
 import styles from "./VideoDisplay.module.css"
-import {Link, useNavigate} from "react-router-dom";
-import axios from 'axios';
+import {Link} from "react-router-dom";
 
-const VideoDisplay = ({imgUrl, title, videoName}) => {
-  const url = import.meta.env.VITE_API_URL + "/thumbnails/"
+const VideoDisplay = ({imgUrl, title}) => {
+  const url = "http://localhost:8000/thumbnails/"
   let cleanTitle = title.replace(/\.jpg$/, '');
   cleanTitle = cleanTitle.replace(url, '');
   cleanTitle = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1)
-  
-  let navigate = useNavigate()
-
-  const handleClick = async (e) => {
-    e.preventDefault()
-    navigate("/live_comparison")
-    const params = new URLSearchParams({"video_name": videoName})
-    await axios.get(import.meta.env.VITE_API_URL + "/start-video?" + params)
-  }
-
   return(
-    <Link onClick={handleClick}>
+    <Link to="/live_comparison">
       <div className={styles["video-display"]}>
-        <img className={styles.thumbnail} src={url + imgUrl} alt="thumbnail" />
+        <img className={styles.thumbnail} src={imgUrl} alt="thumbnail" />
         <div className={styles["title-wrapper"]}>
           {cleanTitle}
         </div>
