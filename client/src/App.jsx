@@ -4,7 +4,7 @@ import HomePage from './pages/HomePage.jsx';
 
 import SelectVideoPage from './pages/SelectVideoPage/SelectVideoPage.jsx';
 import DanceScreen from './components/DanceScreen/DanceScreen.jsx';
-import ScoringPage from './pages/ScoringPage.jsx';
+import ScoringPage from './pages/ScoringPage/ScoringPage.jsx';
 
 function App() {
   return(

@@ -127,7 +127,16 @@ async def get_detailed_scores():
     Return detailed scores and information about frames compared so far
     :return A list of scores for each Keypoint statistics
     """
-    return {"shoulder": [10,20,30,40,50,60]}
+    return {
+            "r_shoulder_l_shoulder_l_elbow": [10,20,30,40,50,60],
+            "l_shoulder_l_elbow_l_wrist": [20,15,40,28,60],
+            "l_shoulder_r_shoulder_r_elbow": [9,56,20,45,60],
+            "r_shoulder_r_elbow_r_wrist": [10,30,40,50,70],
+            "r_hip_l_hip_l_knee": [20,30,40,50,60],
+            "l_hip_l_knee_l_ankle": [20,30,40,50,60],
+            "l_hip_r_hip_r_knee": [20,30,40,50,60],
+            "r_hip_r_knee_r_ankle": [20,30,40,50,60]
+        }
 
 @rest_app.post("/offer")
 async def get_offer(offer: SessionDescription):

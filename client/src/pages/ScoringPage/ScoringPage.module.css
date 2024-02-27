@@ -1,0 +1,17 @@
+.graph_row{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding-bottom: 30px;
+}
+
+.graph_left{
+    width: 40vw;
+    padding: 0px;
+    padding-right: 20px;
+}
+
+.graph_right{
+    width:  40vw;
+    padding: 0px;
+}
