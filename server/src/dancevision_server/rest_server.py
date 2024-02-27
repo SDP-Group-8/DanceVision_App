@@ -17,7 +17,7 @@ from dancevision_server.stream_comparison import StreamComparison
 from dancevision_server.environment import model_var_name
 from dancevision_server.thumbnail_info import ThumbnailInfo
 from dancevision_server.stream_sender import StreamSender
-from dancevision_server.host_identifiers import SERVER_IDENTIFIER
+from dancevision_server.host_identifiers import SERVER_IDENTIFIER, RASPBERRY_PI_IDENTIFIER
 
 rest_app = FastAPI()
 
@@ -29,6 +29,10 @@ only_send = False
 file = None
 
 comparison = None
+
+no_ros = False
+robot_controller = None
+
 connection_offers = {}
 connection_answers = {}
 
@@ -67,6 +71,7 @@ async def start_video(video_name: str):
     global port
     global only_send
     global file
+    global comparison
     
     """
     Start the main comparison screen with the selected video
@@ -77,19 +82,31 @@ async def start_video(video_name: str):
     model_path = os.environ[model_var_name]
     args = {"file": str(filepath)}
 
+    while SERVER_IDENTIFIER not in connection_offers:
+        await asyncio.sleep(2)
+
+    offer = connection_offers[SERVER_IDENTIFIER]
+
     if only_send:
         sender = StreamSender(**args)
 
-        while SERVER_IDENTIFIER not in connection_offers:
-            await asyncio.sleep(2)
-
-        answer = await sender.run(connection_offers[SERVER_IDENTIFIER])
+        answer = await sender.run(offer)
         sender.add_second_track(file=file)
         connection_answers[SERVER_IDENTIFIER] = answer
     else:
-        args.update({"address": address, "port": port})
-        comparison = StreamComparison(parameter_path = model_path, **args)
-        comparison.run()
+        callback = None if no_ros else lambda: robot_controller.set_velocity(0.1)
+
+        comparison = StreamComparison(parameter_path = model_path, on_pose_detections=callback, **args)
+        answer = await comparison.negotiate_sender(offer)
+        connection_answers[SERVER_IDENTIFIER] = answer
+
+        async def set_offer_and_get_answer(local_offer):
+            connection_offers[RASPBERRY_PI_IDENTIFIER] = local_offer
+            while RASPBERRY_PI_IDENTIFIER not in connection_answers:
+                await asyncio.sleep(2)
+            return connection_answers[RASPBERRY_PI_IDENTIFIER]
+
+        await comparison.negotiate_receiver(set_offer_and_get_answer)
 
     return JSONResponse({"message": "Successfully created streaming client"})
 
@@ -177,6 +194,9 @@ def main():
     global only_send
     global file
 
+    global robot_controller
+    global no_ros
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--address", dest="address")
@@ -184,11 +204,17 @@ def main():
     parser.add_argument("--debug", dest="debug", action="store_true")
     parser.add_argument("--only-send", dest="only_send", action="store_true")
     parser.add_argument("--file", dest="file")
+    parser.add_argument("--no-ros", dest="no_ros", action="store_true")
     args = parser.parse_args()
 
     address = args.address
     port = args.port
     debug = args.debug
+    no_ros = args.no_ros
+
+    if not no_ros:
+        from robot_controller.robot_controller_node import RobotControllerNode
+        robot_controller = RobotControllerNode()
 
     if (args.only_send == True) != (args.file is not None):
         raise ValueError("You must set both the --only-send and --file options")
@@ -198,4 +224,5 @@ def main():
 
     thumbnails_dir = VideoSaver.get_video_directory()
     rest_app.mount("/thumbnails", StaticFiles(directory=thumbnails_dir / "thumbnails"))
+    print("got here")
     uvicorn.run(rest_app, host=args.address, port=int(args.port))

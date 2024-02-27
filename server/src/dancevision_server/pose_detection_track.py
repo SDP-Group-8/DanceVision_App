@@ -15,12 +15,10 @@ class PoseDetectionTrack(MediaStreamTrack):
         self.track = track
         self.mediapipe = mediapipe
         self.on_pose_detections = on_pose_detections
-        # self.score_data = ScoreData()
 
     async def recv(self):
         frame = await self.track.recv()
 
-        # rotate image
         img = frame.to_ndarray(format="bgr24")
 
         res = self.mediapipe.process_frame(img, int(frame.time * 1e3))

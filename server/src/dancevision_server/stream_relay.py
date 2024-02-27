@@ -20,6 +20,7 @@ class StreamRelay:
         self.receiver_pc.addTransceiver("video", "recvonly")
 
         self.emitter_pc = RTCPeerConnection()
+        self.emitter_pc.addTransceiver("video", "sendonly")
 
         self.address = address
         self.port = port

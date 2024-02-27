@@ -4,6 +4,7 @@ import requests
 from aiortc import RTCPeerConnection, RTCSessionDescription
 import asyncio
 from fastapi import status
+from typing import Coroutine
 
 from dancevision_server.host_identifiers import RASPBERRY_PI_IDENTIFIER, SERVER_IDENTIFIER
 
@@ -70,6 +71,21 @@ class PeerConnnection:
         await pc.setRemoteDescription(remote_description)
 
     @staticmethod
+    async def negotiate_local_receiver(pc: RTCPeerConnection, get_answer: Coroutine):
+        """
+        Negotiate a peer connection to receive video
+        :param pc: uninitialized peer connection object
+        :param address: server address
+        :param port: server port
+        :param host_id: the id of the video source (to distinguish different connections)
+        """
+        offer = await pc.createOffer()
+        await pc.setLocalDescription(offer)
+        answer = await get_answer(offer)
+        await pc.setRemoteDescription(answer)
+        return offer
+
+    @staticmethod
     async def negotiate_sender(pc: RTCPeerConnection, address: str, port: int, host_id: str = SERVER_IDENTIFIER):
         """
         Negotiate a peer connection to send video
@@ -80,7 +96,7 @@ class PeerConnnection:
         """
         connection_offer = await PeerConnnection.__get_session_description("request-offer", host_id, address, port)
         offer = RTCSessionDescription(sdp=connection_offer["sdp"], type=connection_offer["type"])
-        PeerConnnection.negotiate_local_sender(offer)
+        await PeerConnnection.negotiate_local_sender(pc, offer)
         PeerConnnection.__post_session_description("answer", pc.localDescription, host_id, address, port)
 
     @staticmethod
