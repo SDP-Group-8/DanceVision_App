@@ -6,8 +6,12 @@ build-backend = "setuptools.build_meta"
 name = "dancevision_server"
 version = "0.0.1"
 dependencies = [
-    "fastapi[standard]",
-    "python-multipart"
+    "fastapi",
+    "uvicorn[standard]",
+    "python-multipart",
+    "aiortc",
+    "pose_estimation",
+    "requests"
 ]
 
 description = "Package for Pose Estimation"
