@@ -11,9 +11,10 @@ function App() {
     <div>
       <Router>
         <Routes>
-          <Route path="/" element={<ScoringPage/>}></Route>
+          <Route path="/" element={<HomePage/>}></Route>
           <Route path ="/videos" element={<SelectVideoPage/>}></Route>
           <Route path="/live_comparison" element={<DanceScreen/>}></Route>
+          <Route path="/scoring" element={<ScoringPage/>}></Route>
         </Routes>
       </Router>
     </div>
