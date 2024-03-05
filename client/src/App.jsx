@@ -1,13 +1,14 @@
-import './App.css'
 import { Route, Routes, BrowserRouter as Router} from 'react-router-dom';
-import HomePage from './pages/HomePage.jsx';
 
-import SelectVideoPage from './pages/SelectVideoPage/SelectVideoPage.jsx';
+import HomePage from './pages/HomePage/HomePage';
+import SelectVideoPage from './pages/SelectVideoPage/SelectVideoPage';
 import DanceScreen from './components/DanceScreen/DanceScreen.jsx';
+
+import styles from './App.module.css'
 
 function App() {
   return(
-    <div>
+    <div className={styles.App}>
       <Router>
         <Routes>
           <Route path="/" element={<HomePage></HomePage>}></Route>
