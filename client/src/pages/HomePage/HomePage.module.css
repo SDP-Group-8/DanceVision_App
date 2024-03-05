@@ -1,12 +1,15 @@
-@keyframes gradient {
+@property --rotate {
+  syntax: "<angle>";
+  initial-value: 45deg;
+  inherits: false;
+}
+
+@keyframes rotation {
   0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 10% 50%;
+    --rotate: 0deg;
   }
   100% {
-    background-position: 0% 50%;
+    --rotate: 360deg;
   }
 }
 
@@ -24,14 +27,14 @@
 }
 
 .background {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100vw;
   z-index: -1; /* Ensure it's behind other content */
-  background: var(--purple-gradient);
   height: 100vh;
-  animation: gradient 15s ease infinite;
+  background: linear-gradient(var(--rotate), #db11fb, #2d4af3);
+  animation: rotation 15s linear infinite;
 }
 
 .logo {
