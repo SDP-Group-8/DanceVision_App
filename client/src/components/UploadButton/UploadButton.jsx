@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import styles from './UploadButton.module.css'
 
-function UploadButton() {
+function UploadButton({changePopup}) {
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
@@ -24,8 +24,10 @@ function UploadButton() {
         },
       });
       console.log(response.data);
+      changePopup({success:true, error:false, show:true})
     } catch (error) {
       console.error(error);
+      changePopup({success:false, error:true, show:true})
     }
   };
 

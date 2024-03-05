@@ -7,9 +7,4 @@
   align-items: center;
   justify-content: center;
   border: 2px solid white;
-  transition: transform 0.2s ease;
-}
-
-.button:hover {
-  transform: scale(1.04);
 }

@@ -50,3 +50,10 @@
 .button-container > p {
   font-weight: var(--bold);
 }
+
+.close {
+  background: white;
+  border: 1px solid #d0d5dd;
+  padding: 0.5rem;
+  color: #344054;
+}
