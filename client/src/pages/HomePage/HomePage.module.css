@@ -16,6 +16,7 @@
   flex-direction: column;
   justify-content: center;
   padding: 0 4rem;
+  gap: 2rem;
 }
 
 .HomePage > h1 {
@@ -31,4 +32,18 @@
   background: var(--purple-gradient);
   height: 100vh;
   animation: gradient 15s ease infinite;
+}
+
+.logo {
+  max-width: 200px;
+}
+
+.button-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.button-container > p {
+  font-weight: var(--bold);
 }

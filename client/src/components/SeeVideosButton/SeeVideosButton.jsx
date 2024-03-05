@@ -1,19 +1,15 @@
-import React, { useState } from "react";
-import {
-    BrowserRouter as Router,
-    Link
-} from "react-router-dom";
+import { Link } from "react-router-dom";
+
+import styles from './SeeVideosButton.module.css'
 
 function SeeVideosButton() {
 
     return (
-        <div>
-            <Link to="/videos">
-                <button>
-                    Select a video
-                </button>
-            </Link>
-        </div>
+        <Link to="/videos">
+            <button className={styles.button}>
+                Select a video
+            </button>
+        </Link>  
     )
 }
 

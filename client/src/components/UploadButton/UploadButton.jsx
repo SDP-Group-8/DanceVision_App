@@ -1,16 +1,15 @@
-import { useState } from 'react';
 import axios from 'axios';
 
+import styles from './UploadButton.module.css'
+
 function UploadButton() {
-  const [selectedFile, setSelectedFile] = useState(null);
 
   const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
+    const selectedFile = event.target.files[0];
+    handleSubmit(selectedFile)
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
+  const handleSubmit = async (selectedFile) => {
     const formData = new FormData();
     formData.append("video", selectedFile);
 
@@ -31,10 +30,11 @@ function UploadButton() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="file" name="video" onChange={handleFileChange} />
-      <button type="submit">Upload a video</button>
-    </form>
+      <div className={styles["upload-button"]}>
+        <input type="file" id="video" onChange={handleFileChange} />
+        <label htmlFor="file">Upload a video</label>
+      </div>
+   
   );
 }
 
