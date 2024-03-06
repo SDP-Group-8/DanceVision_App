@@ -4,6 +4,7 @@ import os
 import uvicorn
 import logging
 import asyncio
+from pathlib import Path
 
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, File, UploadFile, status
@@ -18,6 +19,7 @@ from dancevision_server.environment import model_var_name
 from dancevision_server.thumbnail_info import ThumbnailInfo
 from dancevision_server.stream_sender import StreamSender
 from dancevision_server.host_identifiers import SERVER_IDENTIFIER, RASPBERRY_PI_IDENTIFIER
+from dancevision_server.video_loader import VideoLoader
 
 rest_app = FastAPI()
 
@@ -78,6 +80,10 @@ async def start_video(video_name: str):
     :param video_name: name of the video file
     """
     filepath = VideoSaver.get_video_filepath(video_name)
+
+    video_loader = VideoLoader(Path(video_name))
+    keypoints = video_loader.load_keypoints()
+    print(next(keypoints))
 
     model_path = os.environ[model_var_name]
     args = {"file": str(filepath)}
