@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dancevision_server.video_saver import VideoSaver
 from pathlib import Path
 
