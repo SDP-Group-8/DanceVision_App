@@ -25,7 +25,7 @@ class PoseDetectionTrack(MediaStreamTrack):
         if res:
             img = SingleWindow.draw_pose_on_image(img, res.to_normalized_landmarks())
             if self.on_pose_detections:
-                await self.on_pose_detections(res)
+                self.on_pose_detections(res)
 
         # rebuild a VideoFrame, preserving timing information
         new_frame = VideoFrame.from_ndarray(img, format="bgr24")
