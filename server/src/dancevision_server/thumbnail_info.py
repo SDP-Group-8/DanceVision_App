@@ -4,7 +4,7 @@ from pathlib import Path
 class ThumbnailInfo:
     def __init__(self, video_filename: str):
         self.basename = Path(video_filename).stem
-        self.thumbnail_filename = f"{self.basename}.{VideoSaver.thumbnail_extension}"
+        self.thumbnail_filename = VideoSaver.get_thumbnail_filename(Path(video_filename))
         self.video_filename = Path(video_filename).name
 
     def to_dict(self):
