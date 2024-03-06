@@ -5,6 +5,7 @@ from av import VideoFrame
 
 from pose_estimation.mediapipe import MediaPipe
 from pose_estimation.single_window import SingleWindow
+# from pose_estimation.score_data import ScoreData
 
 class PoseDetectionTrack(MediaStreamTrack):
     kind = "video"
@@ -18,7 +19,6 @@ class PoseDetectionTrack(MediaStreamTrack):
     async def recv(self):
         frame = await self.track.recv()
 
-        # rotate image
         img = frame.to_ndarray(format="bgr24")
 
         res = self.mediapipe.process_frame(img, int(frame.time * 1e3))

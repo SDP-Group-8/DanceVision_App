@@ -6,8 +6,12 @@ build-backend = "setuptools.build_meta"
 name = "dancevision_server"
 version = "0.0.1"
 dependencies = [
-    "fastapi[standard]",
-    "python-multipart"
+    "fastapi",
+    "uvicorn[standard]",
+    "python-multipart",
+    "aiortc",
+    "pose_estimation",
+    "requests"
 ]
 
 description = "Package for Pose Estimation"
@@ -21,7 +25,11 @@ classifiers = [
 
 [project.scripts]
 rest-api = "dancevision_server.rest_server:main"
+backend = "dancevision_server.websocket_server:run_socket_and_app"
 video-consumer = "dancevision_server.stream_consumer:main"
+video-relay = "dancevision_server.stream_relay:main"
+video-comparison = "dancevision_server.stream_comparison:main"
+video-sender = "dancevision_server.stream_sender:main"
 
 [project.urls]
 Homepage = "https://github.com/SDP-Group-8/DanceVision_App"
