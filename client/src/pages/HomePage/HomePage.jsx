@@ -29,7 +29,7 @@ const HomePage = () => {
             message="Make sure to upload a ‘.mp4’ file. If error persists, check your network. It could also be our fault tho lol.">
                 <button className={styles.close} onClick={() => changePopup({success:false, error:false, show:false})}>Close</button>
             </Popup>}
-            {showPopup.show && showPopup.success && <Popup title="Video Uploaded!" isSuccess={false} 
+            {showPopup.show && showPopup.success && <Popup title="Video Uploaded!" isSuccess
             message="Video uploaded successfully. You can now select it at the “select videos” page.">
                 <button className={styles.close} onClick={() => changePopup({success:false, error:false, show:false})}>Close</button>
             </Popup>}
