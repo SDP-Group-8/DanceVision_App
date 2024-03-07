@@ -16,6 +16,7 @@ function UploadButton({changePopup}) {
     const axios1 = axios.create({
         baseURL: import.meta.env.VITE_API_URL
     });
+    changePopup({success:false, error:false, show:true, loading:true})
 
     try {
       const response = await axios1.post('/upload-video', formData, {
@@ -24,10 +25,10 @@ function UploadButton({changePopup}) {
         },
       });
       console.log(response.data);
-      changePopup({success:true, error:false, show:true})
+      changePopup({success:true, error:false, show:true, loading:false})
     } catch (error) {
       console.error(error);
-      changePopup({success:false, error:true, show:true})
+      changePopup({success:false, error:true, show:true, loading:false})
     }
   };
 

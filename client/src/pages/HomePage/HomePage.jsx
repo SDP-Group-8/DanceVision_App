@@ -1,3 +1,5 @@
+import { Spinner } from '@chakra-ui/react'
+
 import { UploadButton } from "../../components/UploadButton";
 import { SeeVideosButton } from "../../components/SeeVideosButton";
 import { Popup } from "../../components/Popup";
@@ -7,7 +9,8 @@ import logo from '../../assets/logo.png'
 import { useState } from "react";
 
 const HomePage = () => {
-    const [showPopup, setShowPopup] = useState({success:false, error:false, show:false})
+    const defaultPopup = {success:false, error:false, show:false, loading:false}
+    const [showPopup, setShowPopup] = useState(defaultPopup)
     const changePopup = (data) => {
         setShowPopup(data)
     }
@@ -27,12 +30,17 @@ const HomePage = () => {
             </div>
             {showPopup.show && showPopup.error && <Popup title="Failed to upload video" isSuccess={false} 
             message="Make sure to upload a ‘.mp4’ file. If error persists, check your network. It could also be our fault tho lol.">
-                <button className={styles.close} onClick={() => changePopup({success:false, error:false, show:false})}>Close</button>
+                <button className={styles.close} onClick={() => changePopup(defaultPopup)}>Close</button>
             </Popup>}
             {showPopup.show && showPopup.success && <Popup title="Video Uploaded!" isSuccess
             message="Video uploaded successfully. You can now select it at the “select videos” page.">
-                <button className={styles.close} onClick={() => changePopup({success:false, error:false, show:false})}>Close</button>
+                <button className={styles.close} onClick={() => changePopup(defaultPopup)}>Close</button>
             </Popup>}
+            {showPopup.show && showPopup.loading && <Popup displayIcon={false}>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'center'}}>
+                    <Spinner size='xl' thickness='8px'/>
+                    </div>
+                    </Popup>}
             
         </>
         
