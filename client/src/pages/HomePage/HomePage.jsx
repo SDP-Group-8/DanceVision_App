@@ -9,7 +9,7 @@ import logo from '../../assets/logo.png'
 import { useState } from "react";
 
 const HomePage = () => {
-    const defaultPopup = {success:false, error:false, show:false, loading:false}
+    const defaultPopup = {success:false, error:{status:false, message:""}, show:false, loading:false}
     const [showPopup, setShowPopup] = useState(defaultPopup)
     const changePopup = (data) => {
         setShowPopup(data)
@@ -28,8 +28,8 @@ const HomePage = () => {
                 <div className={styles.background}></div>
                 
             </div>
-            {showPopup.show && showPopup.error && <Popup title="Failed to upload video" isSuccess={false} 
-            message="Make sure to upload a ‘.mp4’ file. If error persists, check your network. It could also be our fault tho lol.">
+            {showPopup.show && showPopup.error.status && <Popup title="Failed to upload video" isSuccess={false} 
+            message={showPopup.error.message}>
                 <button className={styles.close} onClick={() => changePopup(defaultPopup)}>Close</button>
             </Popup>}
             {showPopup.show && showPopup.success && <Popup title="Video Uploaded!" isSuccess

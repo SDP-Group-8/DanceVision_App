@@ -28,7 +28,7 @@ function UploadButton({changePopup}) {
       changePopup({success:true, error:false, show:true, loading:false})
     } catch (error) {
       console.error(error);
-      changePopup({success:false, error:true, show:true, loading:false})
+      changePopup({success:false, error:{status: true, message:error.response.data.detail}, show:true, loading:false})
     }
   };
 
