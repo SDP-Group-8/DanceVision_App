@@ -45,16 +45,17 @@
   align-items: flex-end;
   position: absolute;
   bottom: 0;
-  height: calc(100% - 4rem);
-  width: calc(100% - 4rem);
+  height: 100%;
+  width: 100%;
   font-size: 1.2rem;
   text-align: left;
   font-weight: bold;
   transition: all 0.3s ease-in-out;
+  color: white;
 }
 
 .title-wrapper:hover {
-  background: linear-gradient(rgba(0, 0, 0, 0), #000);
+  background: linear-gradient(rgba(0, 0, 0, 0.6), black);
   opacity: 1;
   cursor: pointer;
 }

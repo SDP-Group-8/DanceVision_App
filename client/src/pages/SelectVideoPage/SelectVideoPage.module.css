@@ -1,14 +1,39 @@
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .SelectVideoPage {
+  position: relative;
   display: flex;
+  height: 100%;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-image: radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.005) 0,
+      rgba(255, 255, 255, 0.005) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 100px 100px;
+  background-attachment: fixed;
+  background-color: black;
 }
 
 .thumbnail-container {
   display: flex;
-  padding: 2rem;
+  height: 50vw;
+  z-index: 999;
   margin-top: 2rem;
-  max-width: 60vw;
+  max-width: 80vw;
   width: 100%;
   display: flex;
   flex-wrap: nowrap;
@@ -19,11 +44,31 @@
   gap: 1rem;
 }
 
+.gradient {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  top: 25%;
+  z-index: 0;
+  filter: blur(120px);
+  opacity: 0.9;
+  background: var(--purple-gradient);
+  animation: spin 15s linear infinite;
+}
+
+.thumbnail-container::after {
+  width: 200px;
+  background-color: aqua;
+}
+
 .thumbnail-container::-webkit-scrollbar {
   display: none;
 }
 
 .header {
-  font-size: 2.5rem;
-  font-weight: bold;
+  width: calc(100%-2rem);
+  color: white;
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
 }

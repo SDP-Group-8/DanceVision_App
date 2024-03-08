@@ -1,4 +1,7 @@
 :root {
   --purple-gradient: linear-gradient(45deg, #db11fb, #2d4af3);
   --pink: #db11fb;
+  --blue: #2d4af3;
+  --pink-rgb: 219, 17, 251;
+  --blue-rgb: 45, 74, 243;
 }
