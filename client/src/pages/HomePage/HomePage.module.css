@@ -50,3 +50,14 @@
   padding: 0.5rem;
   color: #344054;
 }
+
+@media (max-width: 400px) {
+  .button-container {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .logo {
+    max-width: 90px;
+  }
+}

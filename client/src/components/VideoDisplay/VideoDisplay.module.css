@@ -60,3 +60,10 @@
   opacity: 1;
   cursor: pointer;
 }
+
+@media (max-width: 400px) {
+  .title-wrapper {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+}
