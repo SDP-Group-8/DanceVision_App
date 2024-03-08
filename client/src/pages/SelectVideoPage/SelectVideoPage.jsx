@@ -1,10 +1,18 @@
 import useFetchImages from "../../hooks/useFetchImages";
 import styles from "./SelectVideoPage.module.css";
+import { Spinner } from '@chakra-ui/react'
 
 import VideoDisplay from "../../components/VideoDisplay/VideoDisplay";
 
-const Loader = ({message}) => {
-  return (<div className={styles.SelectVideoPage}><h1 style={{zIndex: 1}}>{message}</h1><div className={styles.gradient}></div></div>)
+const Loader = ({message, isLoading=false}) => {
+  return (
+  <div className={styles.SelectVideoPage}>
+    {isLoading && <Spinner style={{zIndex: 1}} size='xl' thickness='8px' color='white'/>}
+    {message && <h1 style={{zIndex: 1}}>{message}</h1>}
+    
+    <div className={styles.gradient}></div>
+  </div>
+    )
 }
 
 function SelectVideoPage() {
@@ -13,11 +21,11 @@ function SelectVideoPage() {
     console.log(images)
 
     if (isLoading) {
-      return <Loader message={"Loading Images..."}/>;
+      return <Loader message={"Fetching videos..."} isLoading/>;
     }
   
     if (error) {
-      return <Loader message={`Error fetching images: ${error.message}`}/>;
+      return <Loader message={`Error fetching videos: ${error.message}`}/>;
     }
 
     return (
