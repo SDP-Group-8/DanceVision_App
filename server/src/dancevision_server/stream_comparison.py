@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 from typing import Callable
 
 from aiortc import RTCPeerConnection
@@ -8,24 +7,35 @@ from aiortc.contrib.media import MediaRelay
 from aiortc.contrib.media import MediaPlayer
 
 from pose_estimation.mediapipe import MediaPipe
+from aiortc.rtcrtpsender import RTCRtpSender
 
 from dancevision_server.pose_detection_track import PoseDetectionTrack
 from dancevision_server.peer_connection import PeerConnnection
+from dancevision_server.host_identifiers import SERVER_IDENTIFIER, RASPBERRY_PI_IDENTIFIER
 
 relay = MediaRelay()
 
 class StreamComparison:
 
-    def __init__(self, parameter_path: str, on_pose_detections: Callable | None = None, **kwargs):
+    def __init__(self, address: str, port: int, parameter_path: str, on_pose_detections: Callable | None = None, **kwargs):
         global relay
 
         self.receiver_pc = RTCPeerConnection()
-        self.receiver_pc.addTransceiver("video", "recvonly")
         self.receiver_pc.addTransceiver("video", "recvonly")
 
         self.emitter_pc = RTCPeerConnection()
         self.emitter_pc.addTransceiver("video", "sendonly")
         self.emitter_pc.addTransceiver("video", "sendonly")
+
+        self.address = address
+        self.port = port
+
+        capabilities = RTCRtpSender.getCapabilities('video')
+        preferences = list(filter(lambda x: x.name == 'H264', capabilities.codecs))
+        
+        #self.receiver_pc.getTransceivers()[0].setCodecPreferences(preferences)
+        #self.emitter_pc.getTransceivers()[0].setCodecPreferences(preferences)
+        #self.emitter_pc.getTransceivers()[1].setCodecPreferences(preferences)
 
         mediapipe = MediaPipe()
         mediapipe.initialize(parameter_path)
@@ -38,6 +48,20 @@ class StreamComparison:
             self.emitter_pc.addTrack(
                 PoseDetectionTrack(relay.subscribe(track), mediapipe, on_pose_detections)
             )
+
+        @self.receiver_pc.on("connectionstatechange")
+        async def on_receiver_state_changed():
+            if self.receiver_pc.connectionState == "closed":
+                self.on_connection_closed()
+
+        @self.emitter_pc.on("connectionstatechange")
+        async def on_emitter_state_changed():    
+            if self.emitter_pc.connectionState == "closed":
+                self.on_connection_closed()
+
+    def on_connection_closed(self):
+        for id in SERVER_IDENTIFIER, RASPBERRY_PI_IDENTIFIER:
+            PeerConnnection.register_connection_closed(self.address, self.port, id)
 
     async def negotiate_sender(self, offer):
         return await PeerConnnection.negotiate_local_sender(self.emitter_pc, offer)

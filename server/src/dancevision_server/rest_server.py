@@ -84,8 +84,8 @@ async def start_video(video_name: str):
     filepath = VideoSaver.get_video_filepath(video_name)
 
     video_loader = VideoLoader(Path(video_name))
-    keypoints = video_loader.load_keypoints()
-    print(next(keypoints))
+    #keypoints = video_loader.load_keypoints()
+    #print(next(keypoints))
 
     model_path = os.environ[model_var_name]
     args = {"file": str(filepath)}
@@ -104,7 +104,7 @@ async def start_video(video_name: str):
     else:
         callback = None if no_ros else lambda: robot_controller.set_velocity(0.1)
 
-        comparison = StreamComparison(parameter_path = model_path, on_pose_detections=callback, **args)
+        comparison = StreamComparison(address, port, parameter_path = model_path, on_pose_detections=callback, **args)
         answer = await comparison.negotiate_sender(offer)
         connection_answers[SERVER_IDENTIFIER] = answer
 
@@ -202,6 +202,18 @@ async def request_answer(host_id: str):
     else:
         return JSONResponse("", status_code=status.HTTP_409_CONFLICT)
 
+@rest_app.get("/connection-close")
+async def connection_close(host_id: str):
+    """
+    Clears the connection negotation between parties
+    :param host_id: Host identifier for peer connection
+    :return: Successful response
+    """
+    global connection_offers
+    global connection_answers
+    del connection_offers[host_id]
+    del connection_answers[host_id]
+    return JSONResponse({"message": "Successfully cleared cache"})
 
 def main():
     global address
