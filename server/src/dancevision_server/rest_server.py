@@ -6,11 +6,10 @@ import os
 import uvicorn
 import logging
 import asyncio
-from pathlib import Path
 
 from fastapi.staticfiles import StaticFiles
-from fastapi import FastAPI, File, UploadFile, status, HTTPException
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi import FastAPI, File, UploadFile, status
+from fastapi.responses import JSONResponse
 
 import argparse
 
