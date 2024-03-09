@@ -123,19 +123,6 @@ async def get_thumbnails():
     names = (ThumbnailInfo(video_file) for video_file in videos_dir.iterdir() if video_file.is_file())
     return {"thumbnails": [thumbnail.to_dict() for thumbnail in names]}
 
-# Retrive specific thumbnails
-@rest_app.get("/thumbnails/{filename}")
-async def get_thumbnail(filename: str):
-    thumbnail_directory = Path("../uploads/thumbnails")
-    file_path = thumbnail_directory / filename
-
-    # Check if the file exists
-    if not file_path.is_file() or file_path.suffix.lower() not in {'.jpg', '.jpeg', '.png'}:
-        raise HTTPException(status_code=404, detail="File not found")
-
-    # Return the file as a response
-    return FileResponse(file_path, media_type="image/jpeg")
-
 @rest_app.get("/detailed_scores")
 async def get_detailed_scores():
     """
