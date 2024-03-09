@@ -1,0 +1,63 @@
+@property --rotate {
+  syntax: "<angle>";
+  initial-value: 45deg;
+  inherits: false;
+}
+
+@keyframes rotation {
+  0% {
+    --rotate: 0deg;
+  }
+  100% {
+    --rotate: 360deg;
+  }
+}
+
+.HomePage {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 4rem;
+  gap: 2rem;
+  background: linear-gradient(var(--rotate), #db11fb, #2d4af3);
+  animation: rotation 15s linear infinite;
+}
+
+.HomePage > h1 {
+  font-weight: var(--bold);
+  color: white;
+}
+
+.logo {
+  max-width: 200px;
+}
+
+.button-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: white;
+}
+
+.button-container > p {
+  font-weight: var(--bold);
+}
+
+.close {
+  background: white;
+  border: 1px solid #d0d5dd;
+  padding: 0.5rem;
+  color: #344054;
+}
+
+@media (max-width: 400px) {
+  .button-container {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .logo {
+    max-width: 90px;
+  }
+}

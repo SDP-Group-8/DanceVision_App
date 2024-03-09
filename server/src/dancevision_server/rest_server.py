@@ -57,9 +57,8 @@ async def upload_video(video: UploadFile = File(...)):
     :return: Successfull response or error message
     """
     video_saver = VideoSaver(video)
-    valid = video_saver.validate()
-    if valid is not None:
-        return valid
+    video_saver.validate()
+    
 
     video_saver.save_video()
     video_saver.generate_thumbnail()

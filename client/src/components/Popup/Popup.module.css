@@ -1,0 +1,36 @@
+.popup {
+  background: rgba(52, 64, 84, 0.7);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.body {
+  width: 40vw;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  gap: 1rem;
+  background-color: white;
+  border-radius: 12px;
+}
+
+.body h3 {
+  color: #101828;
+  font-size: 1.2rem;
+}
+
+.body div {
+  color: #667085;
+}
+
+.body img {
+  width: 48px;
+}

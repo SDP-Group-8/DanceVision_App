@@ -18,14 +18,15 @@ const VideoDisplay = ({imgUrl, title, videoName}) => {
   }
 
   return(
-    <Link onClick={handleClick}>
       <div className={styles["video-display"]}>
-        <img className={styles.thumbnail} src={url + imgUrl} alt="thumbnail" />
-        <div className={styles["title-wrapper"]}>
-          {cleanTitle}
-        </div>
+        <Link onClick={handleClick}>
+          <img className={styles.thumbnail} src={url + imgUrl} alt="thumbnail" />
+          <div className={styles["title-wrapper"]}>
+            {cleanTitle}
+          </div>
+        </Link>
       </div>
-    </Link>
+    
   )
 }
 export default VideoDisplay;

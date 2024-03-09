@@ -1,0 +1,30 @@
+.upload-button label {
+  position: relative;
+  width: 9.375rem;
+  height: 3.12rem;
+  border-radius: 10px;
+  background-color: var(--pink);
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.upload-button input {
+  opacity: 0;
+  font-size: 0;
+  padding: none;
+  z-index: 1;
+  width: 9.375rem;
+  height: 3.12rem;
+  position: absolute;
+}
+
+.upload-button input:hover {
+  cursor: pointer;
+}
+
+.upload-button input:hover + label {
+  transform: scale(1.04);
+}
