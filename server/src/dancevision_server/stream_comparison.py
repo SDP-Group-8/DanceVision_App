@@ -30,13 +30,6 @@ class StreamComparison:
         self.address = address
         self.port = port
 
-        capabilities = RTCRtpSender.getCapabilities('video')
-        preferences = list(filter(lambda x: x.name == 'H264', capabilities.codecs))
-        
-        #self.receiver_pc.getTransceivers()[0].setCodecPreferences(preferences)
-        #self.emitter_pc.getTransceivers()[0].setCodecPreferences(preferences)
-        #self.emitter_pc.getTransceivers()[1].setCodecPreferences(preferences)
-
         mediapipe = MediaPipe()
         mediapipe.initialize(parameter_path)
 
