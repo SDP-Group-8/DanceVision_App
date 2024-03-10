@@ -124,35 +124,34 @@ form {
 	width: 100%;
   }
 
-.input-wrapper:hover{
+.input-wrapper:focus{
 	border: 1px solid black;
-}
-
-/* .input {
-	background-color: #eee;
-	border: none;
-	border-radius: 0px;
-	padding: 12px 15px 12px 0px;
-	margin: 10px 0px;
-	margin-left: 5px;
-	width: 100%;
-} */
-
-.email-icon{
-	/* padding-left: 10px;
-	size: 100px; */
-	color: #140c0c;
-	
 }
 
 .input {
 	background-color: #eee;
 	border: none;
 	border-radius: 0px;
+	padding: 12px 15px 12px 0px;
+	margin-left: 10px;
+	width: 100%;
+}
+
+.email-icon{
+	/* padding-left: 10px; */
+	/* size: 100px; */
+	/* color: #140c0c; */
+	
+}
+
+/* .input {
+	background-color: #eee;
+	border: none;
+	border-radius: 0px;
 	padding: 12px 15px;
 	margin: 10px 0px;
 	width: 100%;
-}
+} */
 
 .input:focus{
 	/* border: 1px solid black; */

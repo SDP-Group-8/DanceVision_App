@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import styles from "./SignInUpForm.module.css";
 import { Box } from "@chakra-ui/react";
 import { MdOutlineEmail } from "react-icons/md";
+import { FiUser } from "react-icons/fi";
+import { MdLock } from "react-icons/md";
+
 
 function SignInUpForm() {
   const [isSignUpActive, setIsSignUpActive] = useState(false);
@@ -42,8 +45,8 @@ function SignInUpForm() {
         >
           <form onSubmit={handleSubmit}>
             <h1 className={styles["h1"]}>Create Account</h1>
-            {/* <div className={styles["input-wrapper"]}> */}
-              {/* <MdOutlineEmail className={styles["email-icon"]} size={20} /> */}
+            <div className={styles["input-wrapper"]}>
+              <FiUser className={styles["email-icon"]} size={20} />
               <input
                 type="text"
                 placeholder="Name"
@@ -51,20 +54,27 @@ function SignInUpForm() {
                 className={styles["input"]}
                 onChange={(e) => setName(e.target.value)}
               />
-            {/* </div> */}
+            </div>
 
-            <input
-              type="email"
-              placeholder="Email"
-              className={styles["input"]}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <div className={styles["input-wrapper"]}>
+              <MdOutlineEmail className={styles["email-icon"]} size={20} />
+              <input
+                type="email"
+                placeholder="Email"
+                className={styles["input"]}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+
+            <div className={styles["input-wrapper"]}>
+              <MdLock className={styles["email-icon"]} size={20} />
             <input
               type="password"
               placeholder="Password"
               className={styles["input"]}
               onChange={(e) => setPassword(e.target.value)}
             />
+            </div>
             <button className={styles["button"]}>Sign Up</button>
           </form>
         </div>
@@ -76,18 +86,25 @@ function SignInUpForm() {
           <form onSubmit={handleSubmit}>
             <h1 className={styles["h1"]}>Sign in</h1>
             {/* <span>or use your account</span> */}
+            <div className={styles["input-wrapper"]}>
+              <MdOutlineEmail className={styles["email-icon"]} size={20} />
             <input
               type="email"
               placeholder="Email"
               className={styles["input"]}
               onChange={(e) => setEmail(e.target.value)}
             />
+            </div>
+
+            <div className={styles["input-wrapper"]}>
+              <MdLock className={styles["email-icon"]} size={20} />
             <input
               type="password"
               placeholder="Password"
               className={styles["input"]}
               onChange={(e) => setPassword(e.target.value)}
             />
+            </div>
             <a href="#">Forgot your password?</a>
             <button className={styles["button"]}>Sign In</button>
           </form>
