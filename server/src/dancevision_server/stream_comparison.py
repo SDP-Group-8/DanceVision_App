@@ -35,7 +35,7 @@ class StreamComparison:
         async def on_track(track):
             options = {"framerate": "5", "video_size": "640x480"}
             player = MediaPlayer(**kwargs, options=options)
-            #self.emitter_pc.addTrack(player.video)
+            self.emitter_pc.addTrack(player.video)
 
             self.emitter_pc.addTrack(
                 PoseDetectionTrack(relay.subscribe(track, buffered=False), mediapipe, on_pose_detections)
