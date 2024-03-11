@@ -9,7 +9,7 @@ import asyncio
 
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, File, UploadFile, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 
 import argparse
 
@@ -129,6 +129,7 @@ async def get_detailed_scores():
     :return A list of scores for each Keypoint statistics
     """
     return {
+            "total_score" : 70,
             "r_shoulder_l_shoulder_l_elbow": [10,20,30,40,50,60],
             "l_shoulder_l_elbow_l_wrist": [20,15,40,28,60],
             "l_shoulder_r_shoulder_r_elbow": [9,56,20,45,60],
@@ -138,6 +139,14 @@ async def get_detailed_scores():
             "l_hip_r_hip_r_knee": [20,30,40,50,60],
             "r_hip_r_knee_r_ankle": [20,30,40,50,60]
         }
+
+# The saved user video required in the scoring page
+@rest_app.get("/user_video")
+async def get_user_video():
+    path = "/Users/abhayrakeshdeshmukhmaurya/Desktop/CS/finesse_step.mp4"
+    print(FileResponse(path, media_type="video/mp4" ))
+    return FileResponse(path, media_type="video/mp4" )
+    
 
 @rest_app.post("/offer")
 async def get_offer(offer: SessionDescription):

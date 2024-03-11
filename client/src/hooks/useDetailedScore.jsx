@@ -15,6 +15,7 @@ const useDetailedScore = (url, options = {}) => {
         console.log(r_shoulder_l_shoulder_l_elbow);
         setScore(scores => [
           ...scores, 
+          {"total_score": response.data.total_score},
           {"r_shoulder_l_shoulder_l_elbow": response.data.r_shoulder_l_shoulder_l_elbow},
           {"l_shoulder_l_elbow_l_wrist" : response.data.l_shoulder_l_elbow_l_wrist},
           {"l_shoulder_r_shoulder_r_elbow": response.data.l_shoulder_r_shoulder_r_elbow},
