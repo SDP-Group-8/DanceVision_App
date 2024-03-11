@@ -15,7 +15,7 @@ const useDetailedScore = (url, options = {}) => {
         console.log(r_shoulder_l_shoulder_l_elbow);
         setScore(scores => [
           ...scores, 
-          {"total_score": response.data.total_score},
+          
           {"r_shoulder_l_shoulder_l_elbow": response.data.r_shoulder_l_shoulder_l_elbow},
           {"l_shoulder_l_elbow_l_wrist" : response.data.l_shoulder_l_elbow_l_wrist},
           {"l_shoulder_r_shoulder_r_elbow": response.data.l_shoulder_r_shoulder_r_elbow},
@@ -23,7 +23,8 @@ const useDetailedScore = (url, options = {}) => {
           {"r_hip_l_hip_l_knee": response.data.r_hip_l_hip_l_knee},
           {"l_hip_l_knee_l_ankle": response.data.l_hip_l_knee_l_ankle},
           {"l_hip_r_hip_r_knee": response.data.l_hip_r_hip_r_knee},
-          {"r_hip_r_knee_r_ankle": response.data.r_hip_r_knee_r_ankle}
+          {"r_hip_r_knee_r_ankle": response.data.r_hip_r_knee_r_ankle},
+          {"total_score": response.data.total_score},
         ]);
       } catch (error) {
         setError(error);
