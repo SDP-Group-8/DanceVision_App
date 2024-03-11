@@ -17,11 +17,13 @@ import argparse
 from dancevision_server.session_description import SessionDescription
 from dancevision_server.video_saver import VideoSaver
 from dancevision_server.stream_comparison import StreamComparison
-from dancevision_server.environment import model_var_name
+from dancevision_server.environment import model_var_name, script_location_name
 from dancevision_server.thumbnail_info import ThumbnailInfo
 from dancevision_server.stream_sender import StreamSender
 from dancevision_server.host_identifiers import SERVER_IDENTIFIER, RASPBERRY_PI_IDENTIFIER
 from dancevision_server.video_loader import VideoLoader
+
+from dancevision_startup.launch_video_streamer import launch_video_streamer
 
 rest_app = FastAPI()
 
@@ -36,6 +38,9 @@ comparison = None
 
 no_ros = False
 robot_controller = None
+
+stream_address = None
+stream_port = None
 
 connection_offers = {}
 connection_answers = {}
@@ -76,6 +81,8 @@ async def start_video(video_name: str):
     global only_send
     global file
     global comparison
+    global stream_address
+    global stream_port
     
     """
     Start the main comparison screen with the selected video
@@ -84,8 +91,10 @@ async def start_video(video_name: str):
     filepath = VideoSaver.get_video_filepath(video_name)
 
     video_loader = VideoLoader(Path(video_name))
-    #keypoints = video_loader.load_keypoints()
-    #print(next(keypoints))
+    keypoints = video_loader.load_keypoints()
+
+    if stream_address is not None:
+        launch_video_streamer(Path(os.environ[script_location_name]), stream_address, stream_port)
 
     model_path = os.environ[model_var_name]
     args = {"file": str(filepath)}
@@ -226,6 +235,9 @@ def main():
     global robot_controller
     global no_ros
 
+    global stream_address
+    global stream_port
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--address", dest="address")
@@ -234,12 +246,17 @@ def main():
     parser.add_argument("--only-send", dest="only_send", action="store_true")
     parser.add_argument("--file", dest="file")
     parser.add_argument("--no-ros", dest="no_ros", action="store_true")
+    parser.add_argument("--stream-address", dest="stream_address")
+    parser.add_argument("--stream-port", dest="stream_port")
     args = parser.parse_args()
 
     address = args.address
     port = args.port
     debug = args.debug
     no_ros = args.no_ros
+
+    stream_address = args.stream_address
+    stream_port = args.stream_port
 
     if not no_ros:
         from robot_controller.robot_controller_node import RobotControllerNode

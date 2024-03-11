@@ -13,12 +13,10 @@ from dancevision_server.pose_detection_track import PoseDetectionTrack
 from dancevision_server.peer_connection import PeerConnnection
 from dancevision_server.host_identifiers import SERVER_IDENTIFIER, RASPBERRY_PI_IDENTIFIER
 
-relay = MediaRelay()
-
 class StreamComparison:
 
     def __init__(self, address: str, port: int, parameter_path: str, on_pose_detections: Callable | None = None, **kwargs):
-        global relay
+        relay = MediaRelay()
 
         self.receiver_pc = RTCPeerConnection()
         self.receiver_pc.addTransceiver("video", "recvonly")
@@ -35,11 +33,12 @@ class StreamComparison:
 
         @self.receiver_pc.on("track")
         async def on_track(track):
-            player = MediaPlayer(**kwargs)
-            self.emitter_pc.addTrack(player.video)
+            options = {"framerate": "5", "video_size": "640x480"}
+            player = MediaPlayer(**kwargs, options=options)
+            #self.emitter_pc.addTrack(player.video)
 
             self.emitter_pc.addTrack(
-                PoseDetectionTrack(relay.subscribe(track), mediapipe, on_pose_detections)
+                PoseDetectionTrack(relay.subscribe(track, buffered=False), mediapipe, on_pose_detections)
             )
 
         @self.receiver_pc.on("connectionstatechange")
