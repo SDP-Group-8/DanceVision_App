@@ -14,6 +14,7 @@ import { Line, Bar, Pie } from "react-chartjs-2";
 import useDetailedScore from "../../hooks/useDetailedScore";
 import styles from "./ScoringPage.module.css";
 import useUserVideo from "../../hooks/useUserVideo";
+import UserVideoAndTotalScore from "../../components/UserVideoAndTotalScore/UserVideoAndTotalScore";
 
 ChartJS.register(
   CategoryScale,
@@ -134,12 +135,9 @@ const ScoringPage = () => {
         }}
       >
         {videoBlob && (
-          <div className={styles.videoContainer}>
-            <video controls style={{ width: "100%", height: "auto" }}>
-              <source src={URL.createObjectURL(videoBlob)} type="video/mp4" />
-            </video>
-          </div>
+          <UserVideoAndTotalScore videoBlob={videoBlob} value={67}></UserVideoAndTotalScore>
         )}
+        
         <h1 className="text-4xl font-bold">Performance Score</h1>
         <div className={styles.graph_row}>
           <div className={styles.graph_left}>
