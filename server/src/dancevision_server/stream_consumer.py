@@ -9,6 +9,7 @@ import argparse
 from pose_estimation.single_window import SingleWindow
 
 from dancevision_server.peer_connection import PeerConnnection
+from dancevision_server.host_identifiers import RASPBERRY_PI_IDENTIFIER
 
 class PoseDetectionClient():
     def __init__(self, address: str, port: str):
@@ -20,7 +21,8 @@ class PoseDetectionClient():
 
         @self.receiver_pc.on("connectionstatechange")
         async def on_connectionstatechange():
-            print(f"Connection state is {self.receiver_pc.connectionState}")
+            if self.receiver_pc.connectionState == "closed":
+                PeerConnnection.register_connection_closed(self.address, self.port, RASPBERRY_PI_IDENTIFIER)
 
         @self.receiver_pc.on("track")
         async def on_track(track):

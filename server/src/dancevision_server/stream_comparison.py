@@ -33,8 +33,7 @@ class StreamComparison:
 
         @self.receiver_pc.on("track")
         async def on_track(track):
-            options = {"framerate": "5", "video_size": "640x480"}
-            player = MediaPlayer(**kwargs, options=options)
+            player = MediaPlayer(**kwargs)
             self.emitter_pc.addTrack(player.video)
 
             self.emitter_pc.addTrack(

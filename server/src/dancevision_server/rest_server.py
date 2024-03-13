@@ -13,6 +13,7 @@ from fastapi import FastAPI, File, UploadFile, status
 from fastapi.responses import JSONResponse
 
 import argparse
+import logging
 
 from dancevision_server.session_description import SessionDescription
 from dancevision_server.video_saver import VideoSaver
@@ -26,12 +27,11 @@ from dancevision_server.video_loader import VideoLoader
 from dancevision_startup.launch_video_streamer import launch_video_streamer
 
 rest_app = FastAPI()
+logger = logging.getLogger("dancevision_server.rest_server")
 
 address = None
 port = None
-debug = False
 
-only_send = False
 file = None
 
 comparison = None
@@ -78,9 +78,9 @@ async def upload_video(video: UploadFile = File(...)):
 async def start_video(video_name: str):
     global address
     global port
-    global only_send
     global file
     global comparison
+    global no_ros
     global stream_address
     global stream_port
     
@@ -94,7 +94,10 @@ async def start_video(video_name: str):
     keypoints = video_loader.load_keypoints()
 
     if stream_address is not None:
-        launch_video_streamer(Path(os.environ[script_location_name]), stream_address, stream_port)
+        launch_video_streamer(stream_address, stream_port)
+
+    if not no_ros:
+        robot_controller.set_velocity(0.01)
 
     model_path = os.environ[model_var_name]
     args = {"file": str(filepath)}
@@ -104,16 +107,16 @@ async def start_video(video_name: str):
 
     offer = connection_offers[SERVER_IDENTIFIER]
 
-    if only_send:
+    if file is not None:
         sender = StreamSender(**args)
 
         answer = await sender.run(offer)
         sender.add_second_track(file=file)
         connection_answers[SERVER_IDENTIFIER] = answer
     else:
-        callback = None if no_ros else lambda: robot_controller.set_velocity(0.1)
+        #callback = None if no_ros else lambda: robot_controller.set_velocity(0.1)
 
-        comparison = StreamComparison(address, port, parameter_path = model_path, on_pose_detections=callback, **args)
+        comparison = StreamComparison(address, port, parameter_path = model_path, **args)
         answer = await comparison.negotiate_sender(offer)
         connection_answers[SERVER_IDENTIFIER] = answer
 
@@ -224,51 +227,39 @@ async def connection_close(host_id: str):
     del connection_answers[host_id]
     return JSONResponse({"message": "Successfully cleared cache"})
 
-def main():
+def run_app(app_address, app_port, app_no_ros=True, app_stream_address=None, app_stream_port=None, app_file=None):
     global address
     global port
-    global debug
-
-    global only_send
-    global file
-
     global robot_controller
     global no_ros
-
     global stream_address
     global stream_port
+    global file
 
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument("--address", dest="address")
-    parser.add_argument("--port", dest="port")
-    parser.add_argument("--debug", dest="debug", action="store_true")
-    parser.add_argument("--only-send", dest="only_send", action="store_true")
-    parser.add_argument("--file", dest="file")
-    parser.add_argument("--no-ros", dest="no_ros", action="store_true")
-    parser.add_argument("--stream-address", dest="stream_address")
-    parser.add_argument("--stream-port", dest="stream_port")
-    args = parser.parse_args()
-
-    address = args.address
-    port = args.port
-    debug = args.debug
-    no_ros = args.no_ros
-
-    stream_address = args.stream_address
-    stream_port = args.stream_port
+    address = app_address
+    port = app_port
+    no_ros = app_no_ros
+    stream_address = app_stream_address
+    stream_port = app_stream_port
+    file = app_file
 
     if not no_ros:
         from robot_controller.robot_controller_node import RobotControllerNode
         robot_controller = RobotControllerNode()
 
-    if (args.only_send == True) != (args.file is not None):
-        raise ValueError("You must set both the --only-send and --file options")
-
-    only_send = args.only_send
-    file = args.file
-
     thumbnails_dir = VideoSaver.get_video_directory()
     rest_app.mount("/thumbnails", StaticFiles(directory=thumbnails_dir / "thumbnails"))
-    print("got here")
-    uvicorn.run(rest_app, host=args.address, port=int(args.port))
+    uvicorn.run(rest_app, host=app_address, port=int(app_port))
+
+def main():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--address", dest="address")
+    parser.add_argument("--port", dest="port")
+    parser.add_argument("--no-ros", dest="no_ros", action="store_true")
+    parser.add_argument("--stream-address", dest="stream_address")
+    parser.add_argument("--stream-port", dest="stream_port")
+    parser.add_argument("--file", dest="file")
+    args = parser.parse_args()
+
+    run_app(args.address, args.port, args.no_ros, args.stream_address, args.stream_port, args.file)
