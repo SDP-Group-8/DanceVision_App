@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,600;1,700;1,800;1,900&display=swap');
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* padding-top: 50px; */
+    width: 100vw;
+    /* margin: 50px; */
+    background: linear-gradient(var(--rotate), #db11fb, #2d4af3);;
+}
+
+.main_heading{
+    font-family: Poppins;
+    font-size: 40px;
+    padding-top: 5rem;
+    padding-bottom: 2rem;
+    /* padding: 50px 0px; */
+}
+
+.para_container{
+    padding-bottom: 4rem;
+    width: 70%;
+    text-align: center;
+}
+
+.main_paragraph{
+    color: white;
+    font-family: Poppins;
+    font-size: 20px;
+}
+
+.graph_row {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    /* align-items: center;
+    justify-content: space-around; */
+    padding-bottom: 3rem;
+    
+}
+
+.graph_left {
+    width: 40vw;
+    padding: 1rem;
+    margin-right: 3rem;
+    /* padding-right: 20px; */
+    background-color: aliceblue;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 
+			0 10px 10px rgba(0,0,0,0.22);
+    border-radius: 5px;
+}
+
+.graph_right {
+    width: 40vw;
+    /* padding: 0px; */
+    padding: 1rem;
+    background-color: aliceblue;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 
+			0 10px 10px rgba(0,0,0,0.22);
+    border-radius: 5px;
+
+}

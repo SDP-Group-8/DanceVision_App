@@ -138,8 +138,20 @@ async def get_detailed_scores():
             "l_hip_l_knee_l_ankle": [20,30,40,50,60],
             "l_hip_r_hip_r_knee": [20,30,40,50,60],
             "r_hip_r_knee_r_ankle": [20,30,40,50,60],
+
             "total_score" : 70,
-        }
+
+            "avg_score_over_time": [9,56,20,45,60],
+            "avg_r_shoulder_l_shoulder_l_elbow" : 67,
+            "avg_l_shoulder_l_elbow_l_wrist" : 87,
+            "avg_l_shoulder_r_shoulder_r_elbow" : 56,
+            "avg_r_shoulder_r_elbow_r_wrist" : 76,
+            "avg_r_hip_l_hip_l_knee" : 45,
+            "avg_l_hip_l_knee_l_ankle" : 90,
+            "avg_l_hip_r_hip_r_knee": 77,
+            "avg_r_hip_r_knee_r_ankle" : 70
+
+    }
 
 # The saved user video required in the scoring page
 @rest_app.get("/user_video")

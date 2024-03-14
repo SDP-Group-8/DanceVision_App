@@ -3,6 +3,7 @@ import { useState, useEffect} from 'react';
 
 const useDetailedScore = (url, options = {}) => {
   const [score, setScore] = useState([]);
+  const [avgScore, setAvgScore] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -11,8 +12,8 @@ const useDetailedScore = (url, options = {}) => {
       try {
         setIsLoading(true);
         const response = await axios.get(url + "/detailed_scores", { responseType: 'json', ...options });
-        const r_shoulder_l_shoulder_l_elbow = response.data.r_shoulder_l_shoulder_l_elbow;
-        console.log(r_shoulder_l_shoulder_l_elbow);
+        // const r_shoulder_l_shoulder_l_elbow = response.data.r_shoulder_l_shoulder_l_elbow;
+        // console.log(r_shoulder_l_shoulder_l_elbow);
         setScore(scores => [
           ...scores, 
           
@@ -26,6 +27,20 @@ const useDetailedScore = (url, options = {}) => {
           {"r_hip_r_knee_r_ankle": response.data.r_hip_r_knee_r_ankle},
           {"total_score": response.data.total_score},
         ]);
+
+        setAvgScore(avgScores => [
+          ...avgScores,
+          {"avg_score_over_time" : response.data.avg_score_over_time},
+          {"avg_r_shoulder_l_shoulder_l_elbow": response.data.avg_r_shoulder_l_shoulder_l_elbow},
+          {"avg_l_shoulder_l_elbow_l_wrist" : response.data.avg_l_shoulder_l_elbow_l_wrist},
+          {"avg_l_shoulder_r_shoulder_r_elbow": response.data.avg_l_shoulder_r_shoulder_r_elbow},
+          {"avg_r_shoulder_r_elbow_r_wrist": response.data.avg_r_shoulder_r_elbow_r_wrist},
+          {"avg_r_hip_l_hip_l_knee": response.data.avg_r_hip_l_hip_l_knee},
+          {"avg_l_hip_l_knee_l_ankle": response.data.avg_l_hip_l_knee_l_ankle},
+          {"avg_l_hip_r_hip_r_knee": response.data.avg_l_hip_r_hip_r_knee},
+          {"avg_r_hip_r_knee_r_ankle": response.data.avg_r_hip_r_knee_r_ankle},
+          
+        ])
       } catch (error) {
         setError(error);
       } finally {
@@ -35,7 +50,7 @@ const useDetailedScore = (url, options = {}) => {
     fetchScoreData();
   }, []);
 
-  return { score, isLoading, error  };
+  return { score, isLoading, error, avgScore  };
 };
 
 export default useDetailedScore;
