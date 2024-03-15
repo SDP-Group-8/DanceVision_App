@@ -113,3 +113,15 @@ class PeerConnnection:
         answer = await pc.createAnswer()
         await pc.setLocalDescription(answer)
         return answer
+
+    @staticmethod
+    def register_connection_closed(address: str, port: int, host_id: str):
+        """
+        Register that a WebRTC connection has been closed
+        :param address: server address
+        :param port: server port
+        :param host_id: the id of the video source (to distinguish different connections)
+        :return: the server response
+        """
+        url = f"{PeerConnnection.__get_url(address, port)}/connection-close?" + urllib.parse.urlencode({"host_id": host_id})
+        return requests.get(url)

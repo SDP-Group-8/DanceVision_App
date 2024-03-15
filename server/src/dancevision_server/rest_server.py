@@ -6,34 +6,41 @@ import os
 import uvicorn
 import logging
 import asyncio
+from pathlib import Path
 
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, File, UploadFile, status
 from fastapi.responses import JSONResponse, FileResponse
 
 import argparse
+import logging
 
 from dancevision_server.session_description import SessionDescription
 from dancevision_server.video_saver import VideoSaver
 from dancevision_server.stream_comparison import StreamComparison
-from dancevision_server.environment import model_var_name
+from dancevision_server.environment import model_var_name, script_location_name
 from dancevision_server.thumbnail_info import ThumbnailInfo
 from dancevision_server.stream_sender import StreamSender
 from dancevision_server.host_identifiers import SERVER_IDENTIFIER, RASPBERRY_PI_IDENTIFIER
+from dancevision_server.video_loader import VideoLoader
+
+from dancevision_startup.launch_video_streamer import launch_video_streamer
 
 rest_app = FastAPI()
+logger = logging.getLogger("dancevision_server.rest_server")
 
 address = None
 port = None
-debug = False
 
-only_send = False
 file = None
 
 comparison = None
 
 no_ros = False
 robot_controller = None
+
+stream_address = None
+stream_port = None
 
 connection_offers = {}
 connection_answers = {}
@@ -70,15 +77,29 @@ async def upload_video(video: UploadFile = File(...)):
 async def start_video(video_name: str):
     global address
     global port
-    global only_send
     global file
     global comparison
+    global no_ros
+    global stream_address
+    global stream_port
     
     """
     Start the main comparison screen with the selected video
     :param video_name: name of the video file
     """
     filepath = VideoSaver.get_video_filepath(video_name)
+
+    video_loader = VideoLoader(Path(video_name))
+    keypoints = video_loader.load_keypoints()
+
+    def read_lines(stdin, stdout, stderr):
+        stdout.readlines()
+
+    if stream_address is not None:
+        launch_video_streamer(stream_address, stream_port, read_lines)
+
+    if not no_ros:
+        robot_controller.set_velocity(0.01)
 
     model_path = os.environ[model_var_name]
     args = {"file": str(filepath)}
@@ -88,16 +109,16 @@ async def start_video(video_name: str):
 
     offer = connection_offers[SERVER_IDENTIFIER]
 
-    if only_send:
+    if file is not None:
         sender = StreamSender(**args)
 
         answer = await sender.run(offer)
         sender.add_second_track(file=file)
         connection_answers[SERVER_IDENTIFIER] = answer
     else:
-        callback = None if no_ros else lambda: robot_controller.set_velocity(0.1)
+        #callback = None if no_ros else lambda: robot_controller.set_velocity(0.1)
 
-        comparison = StreamComparison(parameter_path = model_path, on_pose_detections=callback, **args)
+        comparison = StreamComparison(address, port, parameter_path = model_path, **args)
         answer = await comparison.negotiate_sender(offer)
         connection_answers[SERVER_IDENTIFIER] = answer
 
@@ -217,44 +238,52 @@ async def request_answer(host_id: str):
     else:
         return JSONResponse("", status_code=status.HTTP_409_CONFLICT)
 
+@rest_app.get("/connection-close")
+async def connection_close(host_id: str):
+    """
+    Clears the connection negotation between parties
+    :param host_id: Host identifier for peer connection
+    :return: Successful response
+    """
+    global connection_offers
+    global connection_answers
+    del connection_offers[host_id]
+    del connection_answers[host_id]
+    return JSONResponse({"message": "Successfully cleared cache"})
 
-def main():
+def run_app(app_address, app_port, app_no_ros=True, app_stream_address=None, app_stream_port=None, app_file=None):
     global address
     global port
-    global debug
-
-    global only_send
-    global file
-
     global robot_controller
     global no_ros
+    global stream_address
+    global stream_port
+    global file
 
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument("--address", dest="address")
-    parser.add_argument("--port", dest="port")
-    parser.add_argument("--debug", dest="debug", action="store_true")
-    parser.add_argument("--only-send", dest="only_send", action="store_true")
-    parser.add_argument("--file", dest="file")
-    parser.add_argument("--no-ros", dest="no_ros", action="store_true")
-    args = parser.parse_args()
-
-    address = args.address
-    port = args.port
-    debug = args.debug
-    no_ros = args.no_ros
+    address = app_address
+    port = app_port
+    no_ros = app_no_ros
+    stream_address = app_stream_address
+    stream_port = app_stream_port
+    file = app_file
 
     if not no_ros:
         from robot_controller.robot_controller_node import RobotControllerNode
         robot_controller = RobotControllerNode()
 
-    if (args.only_send == True) != (args.file is not None):
-        raise ValueError("You must set both the --only-send and --file options")
-
-    only_send = args.only_send
-    file = args.file
-
     thumbnails_dir = VideoSaver.get_video_directory()
     rest_app.mount("/thumbnails", StaticFiles(directory=thumbnails_dir / "thumbnails"))
-    print("got here")
-    uvicorn.run(rest_app, host=args.address, port=int(args.port))
+    uvicorn.run(rest_app, host=app_address, port=int(app_port))
+
+def main():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--address", dest="address")
+    parser.add_argument("--port", dest="port")
+    parser.add_argument("--no-ros", dest="no_ros", action="store_true")
+    parser.add_argument("--stream-address", dest="stream_address")
+    parser.add_argument("--stream-port", dest="stream_port")
+    parser.add_argument("--file", dest="file")
+    args = parser.parse_args()
+
+    run_app(args.address, args.port, args.no_ros, args.stream_address, args.stream_port, args.file)

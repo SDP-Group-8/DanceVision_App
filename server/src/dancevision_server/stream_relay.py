@@ -12,6 +12,7 @@ from pose_estimation.mediapipe import MediaPipe
 from dancevision_server.pose_detection_track import PoseDetectionTrack
 from dancevision_server.environment import model_var_name
 from dancevision_server.peer_connection import PeerConnnection
+from dancevision_server.host_identifiers import SERVER_IDENTIFIER, RASPBERRY_PI_IDENTIFIER
 
 relay = MediaRelay()
 
@@ -39,7 +40,21 @@ class StreamRelay:
             )
 
             await PeerConnnection.negotiate_sender(self.emitter_pc, self.address, self.port)
-        
+
+        @self.receiver_pc.on("connectionstatechange")
+        async def on_receiver_state_changed():
+            if self.receiver_pc.connectionState == "closed":
+                self.on_connection_closed()
+
+        @self.emitter_pc.on("connectionstatechange")
+        async def on_emitter_state_changed():    
+            if self.emitter_pc.connectionState == "closed":
+                self.on_connection_closed()
+
+    def on_connection_closed(self):
+        for id in SERVER_IDENTIFIER, RASPBERRY_PI_IDENTIFIER:
+            PeerConnnection.register_connection_closed(self.address, self.port, id)
+
     async def run(self):
         await asyncio.gather(
             PeerConnnection.negotiate_receiver(self.receiver_pc, self.address, self.port),
@@ -60,5 +75,8 @@ def main():
     if args.parameter_path is None:
         raise RuntimeError(f"Model path not specified and not found in enviroment variable {model_var_name}")
 
-    client = StreamRelay(args.address, args.port, args.parameter_path)
-    asyncio.run(client.run())
+    async def run():
+        client = StreamRelay(args.address, args.port, args.parameter_path)
+        client.run()
+
+    asyncio.run(run())
