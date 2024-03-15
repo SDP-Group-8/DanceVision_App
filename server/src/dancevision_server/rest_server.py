@@ -93,8 +93,11 @@ async def start_video(video_name: str):
     video_loader = VideoLoader(Path(video_name))
     keypoints = video_loader.load_keypoints()
 
+    def read_lines(stdin, stdout, stderr):
+        stdout.readlines()
+
     if stream_address is not None:
-        launch_video_streamer(stream_address, stream_port)
+        launch_video_streamer(stream_address, stream_port, read_lines)
 
     if not no_ros:
         robot_controller.set_velocity(0.01)
