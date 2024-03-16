@@ -1,0 +1,54 @@
+.danceScreen {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 4rem;
+  justify-content: center;
+  background-image: radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.005) 0,
+      rgba(255, 255, 255, 0.005) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 100px 100px;
+  background-attachment: fixed;
+  background-color: #1f1f1f;
+}
+
+.videoContainer {
+  display: flex;
+  gap: 3rem;
+  height: 100%;
+  justify-content: space-around;
+}
+
+.liveVideo,
+.refVideo {
+  height: 100%;
+  border-radius: 1rem;
+  aspect-ratio: 9/16;
+}
+
+.refVideo video,
+.liveVideo video {
+  height: 100%;
+  border-radius: 1rem;
+  object-fit: cover;
+}
+
+.liveVideo {
+  height: 90%;
+}
+
+.leftPanel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.rightPanel {
+  height: 90%;
+  aspect-ratio: 9/16;
+}

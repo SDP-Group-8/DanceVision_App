@@ -19,12 +19,12 @@ const VideoDisplay = ({imgUrl, title, videoName}) => {
 
   return(
       <div className={styles["video-display"]}>
-        <Link onClick={handleClick}>
+        
           <img className={styles.thumbnail} src={url + imgUrl} alt="thumbnail" />
-          <div className={styles["title-wrapper"]}>
+          <div onClick={handleClick} className={styles["title-wrapper"]}>
             {cleanTitle}
           </div>
-        </Link>
+       
       </div>
     
   )

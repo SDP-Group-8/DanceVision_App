@@ -5,7 +5,6 @@ import styles from './CountdownDonut.module.css'
 
 const CountdownDonut = ({ initialSeconds }) => {
     const [seconds, setSeconds] = useState(initialSeconds);
-    const [show, setShow] = useState(true)
     
     useEffect(() => {
         // Exit early if countdown is finished
@@ -18,9 +17,7 @@ const CountdownDonut = ({ initialSeconds }) => {
         // Set up the timer
         const timer = setInterval(() =>
         {
-            setShow(false)
             setSeconds((prevSeconds) => prevSeconds - 1);
-            setShow(true)
         }, 1000);
     
         // Clean up the timer
@@ -31,7 +28,7 @@ const CountdownDonut = ({ initialSeconds }) => {
     
     return (
         <div className={styles.countdown}>
-            {show >= 0 && <h1>{seconds}</h1>}
+            <h1>{seconds}</h1>
             
             <div className={styles.background}></div>
         </div>
