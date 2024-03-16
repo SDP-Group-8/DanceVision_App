@@ -12,7 +12,7 @@ const DanceScreen = (props) => {
   const {liveVideoSource, recordedVideoSource, isVideoAvailable} = useVideoFeed(import.meta.env.VITE_API_URL);
   const [videoDuration, setVideoDuration] = useState(0);
   const [show, setShow] = React.useState(false)
-  const countdown = 3 // in seconds
+  const countdown = 2 // in seconds
 
   const liveVideos = useRef(new MediaStream())
   const recordedVideos = useRef(new MediaStream())
@@ -22,8 +22,7 @@ const DanceScreen = (props) => {
 
   const handleLoadedMetadata = (event) => {
     // Access the duration property of the video element
-    setVideoDuration(event.target.duration);
-    console.log(event.target.duration)
+    setVideoDuration(Math.round(event.target.duration));
   };
 
   React.useEffect(() => {
@@ -43,13 +42,13 @@ const DanceScreen = (props) => {
         <div className={styles.leftPanel}>
           <h1>Practice</h1>
           <div className={styles.liveVideo}>
-            <video onLoadedMetadata={handleLoadedMetadata} src={liveVid} autoPlay width="100%"></video>
+            <video muted onLoadedMetadata={handleLoadedMetadata} src={liveVid} autoPlay width="100%"></video>
           </div>
           
         </div>
 
         <div className={styles.refVideo}>
-          <video src={refVid} autoPlay width="100%" ></video>
+          <video muted src={refVid} autoPlay width="100%" ></video>
         </div>
         <div className={styles.rightPanel}>
           <h1>Your Score</h1>      

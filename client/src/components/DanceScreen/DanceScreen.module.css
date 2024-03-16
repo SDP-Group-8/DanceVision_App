@@ -20,35 +20,41 @@
 
 .videoContainer {
   display: flex;
-  gap: 3rem;
-  height: 100%;
+  gap: 2rem;
+  height: fit-content;
   justify-content: space-around;
+  align-items: end;
+}
+
+.liveVideo video,
+.refVideo video {
+  object-fit: cover;
+  aspect-ratio: 9/16;
+  max-height: 70vh;
 }
 
 .liveVideo,
 .refVideo {
   height: 100%;
-  border-radius: 1rem;
   aspect-ratio: 9/16;
 }
 
-.refVideo video,
-.liveVideo video {
-  height: 100%;
-  border-radius: 1rem;
-  object-fit: cover;
-}
-
-.liveVideo {
-  height: 90%;
+.refVideo video {
+  max-height: 90vh;
 }
 
 .leftPanel {
   display: flex;
+  height: 100%;
   flex-direction: column;
+  gap: 2rem;
   justify-content: space-between;
 }
 .rightPanel {
-  height: 90%;
-  aspect-ratio: 9/16;
+  width: 20vw;
+  height: 100%;
+}
+
+.timeline {
+  width: 100%;
 }
