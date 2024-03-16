@@ -17,7 +17,7 @@ const DanceScreen = (props) => {
   React.useEffect(() => {
     const timeout = setTimeout(() => {
       setShow(true)
-    }, 20000)
+    }, 10000)
 
     return () => clearTimeout(timeout)
 

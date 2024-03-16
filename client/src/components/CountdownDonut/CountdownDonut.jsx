@@ -1,7 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
+
+import styles from './CountdownDonut.module.css'
 
 const CountdownDonut = ({ initialSeconds }) => {
     const [seconds, setSeconds] = useState(initialSeconds);
+    const [show, setShow] = useState(true)
     
     useEffect(() => {
         // Exit early if countdown is finished
@@ -14,24 +18,22 @@ const CountdownDonut = ({ initialSeconds }) => {
         // Set up the timer
         const timer = setInterval(() =>
         {
+            setShow(false)
             setSeconds((prevSeconds) => prevSeconds - 1);
+            setShow(true)
         }, 1000);
     
         // Clean up the timer
         return () => clearInterval(timer);
     }, [seconds]);
     
-    
-    // Format the remaining time (e.g., “00:05:10” for 5 minutes and 10 seconds)
-    const formatTime = (timeInSeconds) => {
-        const minutes = Math.floor(timeInSeconds / 60).toString().padStart(2, '0');
-        const seconds = (timeInSeconds % 60).toString().padStart(2, '0');
-        return `${minutes}:${seconds}`;
-    };
+  
     
     return (
-        <div style={{border: "5px outset black", align: "center"}}>
-            <h1>{formatTime(seconds)}</h1>
+        <div className={styles.countdown}>
+            {show >= 0 && <h1>{seconds}</h1>}
+            
+            <div className={styles.background}></div>
         </div>
     );
     
