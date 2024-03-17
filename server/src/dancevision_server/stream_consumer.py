@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from aiortc import RTCPeerConnection
-from aiortc.contrib.media import MediaRelay
 import asyncio
 import argparse
 import mediapipe as mp
@@ -10,9 +9,7 @@ import argparse
 from pose_estimation.single_window import SingleWindow
 
 from dancevision_server.peer_connection import PeerConnnection
-from dancevision_server.host_identifiers import SERVER_IDENTIFIER
-
-relay = MediaRelay()
+from dancevision_server.host_identifiers import RASPBERRY_PI_IDENTIFIER
 
 class PoseDetectionClient():
     def __init__(self, address: str, port: str):
@@ -24,7 +21,8 @@ class PoseDetectionClient():
 
         @self.receiver_pc.on("connectionstatechange")
         async def on_connectionstatechange():
-            print(f"Connection state is {self.receiver_pc.connectionState}")
+            if self.receiver_pc.connectionState == "closed":
+                PeerConnnection.register_connection_closed(self.address, self.port, RASPBERRY_PI_IDENTIFIER)
 
         @self.receiver_pc.on("track")
         async def on_track(track):
@@ -42,12 +40,7 @@ class PoseDetectionClient():
 
     async def run(self):
         args = [self.receiver_pc, self.address, self.port]
-
-        await asyncio.gather(
-            PeerConnnection.negotiate_receiver(*args),
-            asyncio.Event().wait()
-        )
-
+        return await PeerConnnection.negotiate_receiver(*args)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -57,5 +50,8 @@ def main():
 
     args = parser.parse_args()
 
-    client = PoseDetectionClient(args.address, args.port)
-    asyncio.run(client.run())
+    async def run():
+        client = PoseDetectionClient(args.address, args.port)
+        await asyncio.gather(client.run(), asyncio.Event().wait())
+    
+    asyncio.run(run())
