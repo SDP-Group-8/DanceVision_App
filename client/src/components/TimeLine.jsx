@@ -15,7 +15,6 @@ const TimeLine = ({duration}) => {
         const timer = setInterval(() =>
         {
             setSeconds((prevSeconds) => prevSeconds + 0.08);
-            console.log(seconds, duration)
         }, 80);
     
         // Clean up the timer

@@ -42,13 +42,13 @@ const DanceScreen = (props) => {
         <div className={styles.leftPanel}>
           <h1>Practice</h1>
           <div className={styles.liveVideo}>
-            <video muted src={liveVid} autoPlay width="100%"></video>
+            <video muted ref={liveVideos} autoPlay width="100%"></video>
           </div>
           
         </div>
 
         <div className={styles.refVideo}>
-          <video muted onLoadedMetadata={handleLoadedMetadata} src={refVid} autoPlay width="100%" ></video>
+          <video onLoadedMetadata={handleLoadedMetadata} ref={recordedVideos} autoPlay width="100%" ></video>
         </div>
         <div className={styles.rightPanel}>
           <h1>Your Score</h1>      
