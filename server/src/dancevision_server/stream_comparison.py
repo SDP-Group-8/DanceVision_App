@@ -38,7 +38,7 @@ class StreamComparison:
             
             if self.recorder:
                 self.recorder.addTrack(player.video)
-                self.recorder.start()
+                await self.recorder.start()
 
             self.emitter_pc.addTrack(
                 PoseDetectionTrack(relay.subscribe(track, buffered=False), mediapipe, on_pose_detections)
@@ -47,14 +47,16 @@ class StreamComparison:
         @self.receiver_pc.on("connectionstatechange")
         async def on_receiver_state_changed():
             if self.receiver_pc.connectionState == "closed":
-                self.on_connection_closed()
+                await self.on_connection_closed()
 
         @self.emitter_pc.on("connectionstatechange")
         async def on_emitter_state_changed():    
             if self.emitter_pc.connectionState == "closed":
-                self.on_connection_closed()
+                await self.on_connection_closed()
 
-    def on_connection_closed(self):
+    async def on_connection_closed(self):
+        await self.recorder.stop()
+
         for id in SERVER_IDENTIFIER, RASPBERRY_PI_IDENTIFIER:
             PeerConnnection.register_connection_closed(self.address, self.port, id)
 

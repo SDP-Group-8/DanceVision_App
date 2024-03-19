@@ -6,20 +6,16 @@ import UserVideoAndTotalScore from "../../components/UserVideoAndTotalScore/User
 import AvgScores from "../../components/AvgScores/AvgScores";
 import DetailedGraphs from "../../components/DetailedGraphs/DetailedGraphs";
 
-const ScoringPage = () => {
+const ScoringPage = (basename, datetime) => {
   const { score, isLoading, error, avgScore } = useDetailedScore(
     import.meta.env.VITE_API_URL
   );
-  console.log("In scoring page", score);
-  console.log(avgScore);
 
   const { videoBlob, videoLoading, videoError } = useUserVideo(
-    import.meta.env.VITE_API_URL
+    import.meta.env.VITE_API_URL, basename, datetime
   );
-  console.log("Video blob in scoring page", videoBlob);
 
   if (isLoading) {
-    console.log(isLoading);
     return <p>Loading images...</p>;
   } else if (error) {
     return <p>Error fetching scores: {error.message}</p>;

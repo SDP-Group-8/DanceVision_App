@@ -1,13 +1,13 @@
 from __future__ import annotations
 
+import av
 import os
-import subprocess
 from pathlib import Path
 
 from dancevision_server.environment import model_var_name, server_root_name
 
 from pose_estimation.mediapipe_video import MediaPipeVideo
-from pose_estimation.timestamped_keypoints import TimestampedKeypoints
+from pose_estimation.timestamped_keypoint_serializer import TimestampedKeypointsSerializer
 
 class VideoSaver:
     thumbnail_extension = "jpg"
@@ -51,6 +51,7 @@ class VideoSaver:
         self.file_size = len(self.file_data)
         self.video_filename = Path(self.video.filename)
         self.destination_path = VideoSaver.get_video_directory()
+        self.destination_file = VideoSaver.get_video_filepath(self.video_filename)
 
         if create_dirs:
             for dir in VideoSaver.get_thumbnail_directory(), VideoSaver.get_keypoint_directory():
@@ -63,25 +64,28 @@ class VideoSaver:
             return {"message": "File size too large"}
 
     def save_video(self):
-        with open(VideoSaver.get_video_filepath(self.video_filename), "wb") as f:
+        with open(self.destination_file, "wb") as f:
             f.write(self.file_data)
 
     def generate_thumbnail(self):
         img_output_path = VideoSaver.get_thumbnail_filepath(self.video_filename)
-        subprocess.call([
-            'ffmpeg',
-            '-i',
-            VideoSaver.get_video_filepath(self.video_filename),
-            '-ss', '00:00:00.000',
-            '-vframes',
-            '1',
-            img_output_path
-        ])
+
+        with av.open(str(self.destination_file), "r") as container:
+            # Signal that we only want to look at keyframes.
+            stream = container.streams.video[0]
+            stream.codec_context.skip_frame = "NONKEY"
+
+            frame = next(container.decode(stream))
+
+            frame.to_image().save(
+                img_output_path,
+                quality=80,
+            )
 
     def save_keypoints(self):
         model_path = os.environ[model_var_name]
         mediapipe_video = MediaPipeVideo(str(VideoSaver.get_video_filepath(self.video_filename)), model_path)
         keypoints = mediapipe_video.estimate_video()
-        text = TimestampedKeypoints.batch_serialize(keypoints)
+        text = TimestampedKeypointsSerializer.batch_serialize(keypoints)
         with open(VideoSaver.get_keypoint_filepath(self.video_filename), "w") as f:
             f.write(text)

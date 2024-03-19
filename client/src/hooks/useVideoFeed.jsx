@@ -3,21 +3,44 @@ import { useState, useEffect} from 'react';
 
 const SERVER_IDENTIFER = "server"
 
-const useVideoFeed = (url, options = {}) => {
+const useVideoFeed = (url, basename, videoName, options = {}) => {
     const [liveVideoSource, setLiveVideoSource] = useState(new MediaStream());
     const [recordedVideoSource, setRecordedVideoSource] = useState(new MediaStream());
     const [isVideoAvailable, setVideoAvailable] = useState(false);
-    
+    const [isConnectionClosed, setConnectionClosed] = useState(false);
+    const [recordingDate, setRecordingDate] = useState(false)
+    const [latestScore, setLatestScore] = useState(0.0)
+
     var config = {
         sdpSemantics: 'unified-plan'
     };
 
     const pc = new RTCPeerConnection(config);
 
+    pc.addEventListener("connectionstatechange", event => {
+        console.log(pc.connectionState)
+        switch (pc.connectionState) {
+            case "disconnected":
+                setConnectionClosed(true)
+                break;
+        }
+    }, false)
+
     useEffect(() => {
         const getVideoStream = async () => {
+            const params = new URLSearchParams({"basename": basename, "video_name": videoName})
+            const res = axios.get(import.meta.env.VITE_API_URL + "/start-video?" + params)
+            
             pc.addTransceiver('video', { direction: 'recvonly' });
             pc.addTransceiver('video', { direction: 'recvonly' });
+            const channel = pc.createDataChannel("score")
+
+            channel.onopen = (event) => {
+                channel.send("sending a message");
+            };
+            channel.onmessage = (event) => {
+                console.log(event.data);
+            };
 
             const offer = await pc.createOffer()
             pc.setLocalDescription(offer);
@@ -81,11 +104,18 @@ const useVideoFeed = (url, options = {}) => {
             } catch (error) {
                 console.error(error);
             }
+
+            const response = await res;
+            setRecordingDate(response.data.datetime)
         };
         getVideoStream();
+
+        return async () => {
+            pc.close()
+        }
     }, [])
 
-    return {liveVideoSource, recordedVideoSource, isVideoAvailable}
+    return {liveVideoSource, recordedVideoSource, isVideoAvailable, isConnectionClosed, recordingDate, latestScore}
 }
 
 export default useVideoFeed;

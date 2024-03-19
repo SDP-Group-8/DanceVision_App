@@ -33,46 +33,46 @@ const DetailedGraphs = (score) => {
     score = score.score
 
   const title_map = {
-    r_shoulder_l_shoulder_l_elbow: "Left Shoulder",
-    l_shoulder_l_elbow_l_wrist: "Left Elbow",
-    l_shoulder_r_shoulder_r_elbow: "Right Shoulder",
-    r_shoulder_r_elbow_r_wrist: "Right Elbow",
-    r_hip_l_hip_l_knee: "Left Hip",
-    l_hip_l_knee_l_ankle: "Left Knee",
-    l_hip_r_hip_r_knee: "Right Hip",
-    r_hip_r_knee_r_ankle: "Right Knee",
+    left_shoulder: "Left Shoulder",
+    left_elbow: "Left Elbow",
+    right_shoulder: "Right Shoulder",
+    right_elbow: "Right Elbow",
+    left_hip: "Left Hip",
+    left_knee: "Left Knee",
+    right_hip: "Right Hip",
+    right_knee: "Right Knee",
   };
 
   const colour_map = {
-    r_shoulder_l_shoulder_l_elbow: {
+    left_shoulder: {
       bg: "rgb(53, 162, 235)",
       border: "rgba(53, 162, 235, 0.5)",
     },
-    l_shoulder_l_elbow_l_wrist: {
+    left_elbow: {
       bg: "rgb(255, 99, 132)",
       border: "rgba(255, 99, 132, 0.5)",
     },
-    l_shoulder_r_shoulder_r_elbow: {
+    right_shoulder: {
       bg: "rgb(75, 192, 192)",
       border: "rgba(75, 192, 192, 0.5)",
     },
-    r_shoulder_r_elbow_r_wrist: {
+    right_elbow: {
       bg: "rgb(255, 205, 86)",
       border: "rgba(255, 205, 86, 0.5)",
     },
-    r_hip_l_hip_l_knee: {
+    left_hip: {
       bg: "rgb(54, 162, 235)",
       border: "rgba(54, 162, 235, 0.5)",
     },
-    l_hip_l_knee_l_ankle: {
+    left_knee: {
       bg: "rgb(153, 102, 255)",
       border: "rgba(153, 102, 255, 0.5)",
     },
-    l_hip_r_hip_r_knee: {
+    right_hip: {
       bg: "rgb(255, 159, 64)",
       border: "rgba(255, 159, 64, 0.5)",
     },
-    r_hip_r_knee_r_ankle: {
+    right_knee: {
       bg: "rgb(255, 0, 0)",
       border: "rgba(255, 0, 0, 0.5)",
     },
@@ -136,10 +136,10 @@ const DetailedGraphs = (score) => {
       <div className={styles.graph_row}>
         <div className={styles.graph_left}>
           <Line
-            options={options("r_shoulder_l_shoulder_l_elbow")}
+            options={options("left_shoulder")}
             data={generateChartData(
-              score[0].r_shoulder_l_shoulder_l_elbow,
-              "r_shoulder_l_shoulder_l_elbow"
+              score[0].left_shoulder,
+              "left_shoulder"
             )}
             height="300px"
             padding="0px"
@@ -147,10 +147,10 @@ const DetailedGraphs = (score) => {
         </div>
         <div className={styles.graph_right}>
           <Line
-            options={options("l_shoulder_l_elbow_l_wrist")}
+            options={options("left_elbow")}
             data={generateChartData(
-              score[1].l_shoulder_l_elbow_l_wrist,
-              "l_shoulder_l_elbow_l_wrist"
+              score[1].left_elbow,
+              "left_elbow"
             )}
             height="300px"
             padding="0px"
@@ -161,10 +161,10 @@ const DetailedGraphs = (score) => {
       <div className={styles.graph_row}>
         <div className={styles.graph_left}>
           <Line
-            options={options("l_shoulder_r_shoulder_r_elbow")}
+            options={options("right_shoulder")}
             data={generateChartData(
-              score[2].l_shoulder_r_shoulder_r_elbow,
-              "l_shoulder_r_shoulder_r_elbow"
+              score[2].right_shoulder,
+              "right_shoulder"
             )}
             height="300px"
             padding="0px"
@@ -172,10 +172,10 @@ const DetailedGraphs = (score) => {
         </div>
         <div className={styles.graph_right}>
           <Line
-            options={options("r_shoulder_r_elbow_r_wrist")}
+            options={options("right_elbow")}
             data={generateChartData(
-              score[3].r_shoulder_r_elbow_r_wrist,
-              "r_shoulder_r_elbow_r_wrist"
+              score[3].right_elbow,
+              "right_elbow"
             )}
             height="300px"
             padding="0px"
@@ -186,10 +186,10 @@ const DetailedGraphs = (score) => {
       <div className={styles.graph_row}>
         <div className={styles.graph_left}>
           <Line
-            options={options("r_hip_l_hip_l_knee")}
+            options={options("left_hip")}
             data={generateChartData(
-              score[4].r_hip_l_hip_l_knee,
-              "r_hip_l_hip_l_knee"
+              score[4].left_hip,
+              "left_hip"
             )}
             height="300px"
             padding="0px"
@@ -197,10 +197,10 @@ const DetailedGraphs = (score) => {
         </div>
         <div className={styles.graph_right}>
           <Line
-            options={options("l_hip_l_knee_l_ankle")}
+            options={options("left_knee")}
             data={generateChartData(
-              score[5].l_hip_l_knee_l_ankle,
-              "l_hip_l_knee_l_ankle"
+              score[5].left_knee,
+              "left_knee"
             )}
             height="300px"
             padding="0px"
@@ -211,10 +211,10 @@ const DetailedGraphs = (score) => {
       <div className={styles.graph_row}>
         <div className={styles.graph_left}>
           <Line
-            options={options("l_hip_r_hip_r_knee")}
+            options={options("right_hip")}
             data={generateChartData(
-              score[6].l_hip_r_hip_r_knee,
-              "l_hip_r_hip_r_knee"
+              score[6].left_knee,
+              "left_knee"
             )}
             height="300px"
             padding="0px"
@@ -222,10 +222,10 @@ const DetailedGraphs = (score) => {
         </div>
         <div className={styles.graph_right}>
           <Line
-            options={options("r_hip_r_knee_r_ankle")}
+            options={options("right_knee")}
             data={generateChartData(
-              score[7].r_hip_r_knee_r_ankle,
-              "r_hip_r_knee_r_ankle"
+              score[7].right_knee,
+              "right_knee"
             )}
             height="300px"
             padding="0px"
