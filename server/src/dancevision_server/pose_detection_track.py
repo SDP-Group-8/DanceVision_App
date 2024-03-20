@@ -18,6 +18,9 @@ class PoseDetectionTrack(MediaStreamTrack):
         self.mediapipe = mediapipe
         self.on_pose_detections = on_pose_detections
 
+    def update_pose_callack(self, on_pose_detections: Callable):
+        self.on_pose_detections = on_pose_detections
+
     async def recv(self):
         frame = await self.track.recv()
 

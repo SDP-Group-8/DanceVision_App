@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,600;1,700;1,800;1,900&display=swap');
+
+.container {
+    width: 100%;
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 50px 0px;
+    /* background-color: aqua; */
+}
+
+.main_heading {
+    background: linear-gradient(var(--rotate), #db11fb, #2d4af3);
+    -webkit-background-clip: text;
+    /* This property allows the text to show through the gradient */
+    -webkit-text-fill-color: transparent;
+    
+    /* padding: 50px 0px 0px 0px; */
+    font-family: Poppins;
+    font-size: 40px;
+    padding-top: 2rem;
+}
+
+.para_container{
+    padding-top: 2rem;
+   
+    width: 70%;
+    text-align: center;
+}
+
+.main_paragraph{
+    color: black;
+    font-family: Poppins;
+    font-size: 20px;
+}
+
+.chart_wrapper {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding: 50px 0px;
+    /* background-color:cornflowerblue; */
+}
+
+.left {
+    display: flex;
+    flex-direction: column;
+
+}
+
+.left_up {
+    display: flex;
+    flex-direction: row;
+}
+
+.left_down {
+    display: flex;
+    flex-direction: row;
+}
+
+.progress_wrapper {
+    padding: 2rem
+}
+
+.progress {
+    padding: 20px;
+    margin: 20px
+}
+
+.progress_name {
+    padding-top: 1rem;
+    text-align: center;
+
+}
+
+.right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    width: 40vw;
+   
+    height: 400px;
+
+    padding: 10px;
+
+}
+
+.line_chart{
+    /* background-color: #E4E4E4; */
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 
+			0 10px 10px rgba(0,0,0,0.22);
+            border-radius: 5px;
+    padding: 1rem;
+    height: 300px;
+}
+
+.graph_heading{
+    color: #2d4af3;
+    padding: 1rem 0rem;
+    font-size: 1.6rem;
+    /* text-decoration: underline */
+}

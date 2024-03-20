@@ -10,19 +10,25 @@ from pathlib import Path
 
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, File, UploadFile, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 
 import argparse
 import logging
 
+from pose_estimation.scoring.euclidean_score import EuclideanScore
+
 from dancevision_server.session_description import SessionDescription
 from dancevision_server.video_saver import VideoSaver
 from dancevision_server.stream_comparison import StreamComparison
-from dancevision_server.environment import model_var_name, script_location_name
+from dancevision_server.environment import model_var_name
 from dancevision_server.thumbnail_info import ThumbnailInfo
 from dancevision_server.stream_sender import StreamSender
 from dancevision_server.host_identifiers import SERVER_IDENTIFIER, RASPBERRY_PI_IDENTIFIER
 from dancevision_server.video_loader import VideoLoader
+from dancevision_server.recorder import Recorder
+from dancevision_server.score_estimator import ScoreEstimator
+from dancevision_server.score_channel import ScoreChannel
+from dancevision_server.score_aggregator import ScoreAggregator
 
 from dancevision_startup.launch_video_streamer import launch_video_streamer
 
@@ -35,6 +41,7 @@ port = None
 file = None
 
 comparison = None
+score_aggregator = None
 
 no_ros = False
 robot_controller = None
@@ -74,11 +81,12 @@ async def upload_video(video: UploadFile = File(...)):
     return {"message": "File uploaded successfully"} 
 
 @rest_app.get("/start-video")
-async def start_video(video_name: str):
+async def start_video(video_name: str, basename: str):
     global address
     global port
     global file
     global comparison
+    global score_aggregator
     global no_ros
     global stream_address
     global stream_port
@@ -91,6 +99,8 @@ async def start_video(video_name: str):
 
     video_loader = VideoLoader(Path(video_name))
     keypoints = video_loader.load_keypoints()
+    if keypoints:
+        score_estimator = ScoreEstimator(keypoints, EuclideanScore())
 
     def read_lines(stdin, stdout, stderr):
         stdout.readlines()
@@ -102,23 +112,48 @@ async def start_video(video_name: str):
         robot_controller.set_velocity(0.01)
 
     model_path = os.environ[model_var_name]
-    args = {"file": str(filepath)}
+
+    score_aggregator = ScoreAggregator()
+
+    def callback(score_channel: ScoreChannel, pose_detections):
+        if score_estimator and score_channel:
+            score, component_scores = score_estimator.find_score(0, pose_detections)
+            score_channel.send_score_message(score)
+            score_aggregator.add_scores(component_scores)
+
+        #callback = None if no_ros else lambda: robot_controller.set_velocity(0.1)
+        pass
 
     while SERVER_IDENTIFIER not in connection_offers:
         await asyncio.sleep(2)
 
     offer = connection_offers[SERVER_IDENTIFIER]
 
-    if file is not None:
-        sender = StreamSender(**args)
+    recorder = Recorder()
+    recorder.initialize(basename)
 
-        answer = await sender.run(offer)
-        sender.add_second_track(file=file)
+    args = {
+        "parameter_path": model_path,
+        "recorder": recorder,
+        "on_pose_detections": callback
+    }
+
+    comparison = None # No clue why this is needed
+
+    if file is not None:
+        def on_connection_closed():            
+            del connection_offers[SERVER_IDENTIFIER]
+            del connection_answers[SERVER_IDENTIFIER]
+
+        args["file"] = file
+        comparison = StreamSender(on_connection_closed=on_connection_closed, **args)
+
+        answer = await comparison.run(offer)
+        comparison.add_second_track(file=str(filepath))
         connection_answers[SERVER_IDENTIFIER] = answer
     else:
-        #callback = None if no_ros else lambda: robot_controller.set_velocity(0.1)
-
-        comparison = StreamComparison(address, port, parameter_path = model_path, **args)
+        args["file"] = str(filepath)
+        comparison = StreamComparison(address, port, **args)
         answer = await comparison.negotiate_sender(offer)
         connection_answers[SERVER_IDENTIFIER] = answer
 
@@ -130,7 +165,7 @@ async def start_video(video_name: str):
 
         await comparison.negotiate_receiver(set_offer_and_get_answer)
 
-    return JSONResponse({"message": "Successfully created streaming client"})
+    return JSONResponse({"datetime": recorder.get_recording_datetime().isoformat()})
 
 # Retrieve thumbnail icons.
 @rest_app.get("/thumbnails")
@@ -149,16 +184,21 @@ async def get_detailed_scores():
     Return detailed scores and information about frames compared so far
     :return A list of scores for each Keypoint statistics
     """
-    return {
-            "r_shoulder_l_shoulder_l_elbow": [10,20,30,40,50,60],
-            "l_shoulder_l_elbow_l_wrist": [20,15,40,28,60],
-            "l_shoulder_r_shoulder_r_elbow": [9,56,20,45,60],
-            "r_shoulder_r_elbow_r_wrist": [10,30,40,50,70],
-            "r_hip_l_hip_l_knee": [20,30,40,50,60],
-            "l_hip_l_knee_l_ankle": [20,30,40,50,60],
-            "l_hip_r_hip_r_knee": [20,30,40,50,60],
-            "r_hip_r_knee_r_ankle": [20,30,40,50,60]
-        }
+    global score_aggregator
+
+    results = score_aggregator.get_all_scores()
+    results["avg_score_over_time"] = []
+
+    return results
+
+@rest_app.get("/user_video")
+async def get_user_video(video_name: str, attempt_datetime: str):
+    """
+    
+    """
+    #FileResponse(path, media_type="video/mp4" )
+    return {"name": video_name}
+    
 
 @rest_app.post("/offer")
 async def get_offer(offer: SessionDescription):

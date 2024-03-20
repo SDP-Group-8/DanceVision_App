@@ -1,18 +1,18 @@
 import useVideoFeed from '../../hooks/useVideoFeed';
 import styles from './DanceScreen.module.css';
 import { CountdownDonut } from "../../components/CountdownDonut";
+import ScoringPage from '../../pages/ScoringPage/ScoringPage.jsx';
 
-import CustomStepper from '../CustomStepper';
-
-import liveVid from '../../assets/sample1.mp4'
-import refVid from '../../assets/sample3.mp4'
-
+import { useLocation } from 'react-router-dom';
 import React, {useRef, useState} from 'react'
-import TimeLine from '../TimeLine';
+import CustomStepper from '../CustomStepper.jsx';
 
-const DanceScreen = (props) => {
-  const {liveVideoSource, recordedVideoSource, isVideoAvailable} = useVideoFeed(import.meta.env.VITE_API_URL);
+function DanceScreen(props) {
+  const { state } = useLocation();
+
   const [videoDuration, setVideoDuration] = useState(0);
+  const {liveVideoSource, recordedVideoSource, isVideoAvailable, isConnectionClosed, recordingDate} 
+    = useVideoFeed(import.meta.env.VITE_API_URL, state.basename, state.videoName);
   const [show, setShow] = React.useState(false)
   const countdown = 5 // in seconds
 
@@ -39,7 +39,8 @@ const DanceScreen = (props) => {
   if (!show) return <CountdownDonut initialSeconds={countdown}/>;
 
   return (
-    <div className={styles.danceScreen}>
+    isConnectionClosed ? <ScoringPage basename={state.basename} datetime={recordingDate} /> 
+    : <div className={styles.danceScreen}>
       <div className={styles.stepper}>
 
       <CustomStepper stepIndex={1}/>
@@ -47,13 +48,13 @@ const DanceScreen = (props) => {
       <div className={styles.videoContainer}>
         <div className={styles.leftPanel}>
           <div className={styles.liveVideo}>
-            <video muted ref={liveVideoSource} autoPlay width="100%"></video>
+            <video ref={liveVideos} autoPlay width="100%"></video>
           </div>
           
         </div>
 
         <div className={styles.refVideo}>
-          <video onLoadedMetadata={handleLoadedMetadata} ref={recordedVideoSource} autoPlay width="100%" ></video>
+          <video ref={recordedVideos} autoPlay width="100%" ></video>
         </div>
         <div className={styles.rightPanel}>
           <h1>Your Score</h1>      

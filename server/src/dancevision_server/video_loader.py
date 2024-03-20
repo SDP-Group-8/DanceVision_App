@@ -1,5 +1,5 @@
 import os
-from pose_estimation.timestamped_keypoints import TimestampedKeypoints
+from pose_estimation.timestamped_keypoint_serializer import TimestampedKeypointsSerializer
 
 from dancevision_server.video_saver import VideoSaver
 
@@ -14,5 +14,5 @@ class VideoLoader:
             return None
 
         with open(filename, "r") as f:
-            text = TimestampedKeypoints.batch_deserialize(f.read())
+            text = TimestampedKeypointsSerializer.batch_deserialize(f.read())
             return text

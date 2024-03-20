@@ -1,0 +1,42 @@
+/* component.module.css */
+
+:root {
+    --progress-circle-bg-color: #efefef;
+}
+
+.my-progress-container {
+    position: relative;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+.my-progress-container .my-progress-bar {
+    width: 100%;
+    position: relative;
+}
+
+.my-progress-container .my-progress-bar .circle-bg {
+    stroke: var(--progress-circle-bg-color);
+    fill: none;
+}
+
+.my-progress-container .my-progress-bar .circle-path {
+    fill: none;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: center;
+    transition: stroke-dasharray 0.5s;
+}
+
+.my-progress-container .my-progress-bar .progress-text {
+    fill: black;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    font-size: 20px;
+}
+
+.my-progress-container .my-progress-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
