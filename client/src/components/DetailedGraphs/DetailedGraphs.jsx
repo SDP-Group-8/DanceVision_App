@@ -213,8 +213,8 @@ const DetailedGraphs = (score) => {
           <Line
             options={options("right_hip")}
             data={generateChartData(
-              score[6].left_knee,
-              "left_knee"
+              score[6].right_hip,
+              "right_hip"
             )}
             height="300px"
             padding="0px"
