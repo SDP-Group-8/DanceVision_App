@@ -2,6 +2,8 @@ import useVideoFeed from '../../hooks/useVideoFeed';
 import styles from './DanceScreen.module.css';
 import { CountdownDonut } from "../../components/CountdownDonut";
 
+import CustomStepper from '../CustomStepper';
+
 import liveVid from '../../assets/sample1.mp4'
 import refVid from '../../assets/sample3.mp4'
 
@@ -38,17 +40,20 @@ const DanceScreen = (props) => {
 
   return (
     <div className={styles.danceScreen}>
+      <div className={styles.stepper}>
+
+      <CustomStepper stepIndex={1}/>
+      </div>
       <div className={styles.videoContainer}>
         <div className={styles.leftPanel}>
-          <h1>Practice</h1>
           <div className={styles.liveVideo}>
-            <video muted ref={liveVideos} autoPlay width="100%"></video>
+            <video muted ref={liveVideoSource} autoPlay width="100%"></video>
           </div>
           
         </div>
 
         <div className={styles.refVideo}>
-          <video onLoadedMetadata={handleLoadedMetadata} ref={recordedVideos} autoPlay width="100%" ></video>
+          <video onLoadedMetadata={handleLoadedMetadata} ref={recordedVideoSource} autoPlay width="100%" ></video>
         </div>
         <div className={styles.rightPanel}>
           <h1>Your Score</h1>      

@@ -12,6 +12,7 @@ import {
 } from "chart.js";
 import { Line, Bar, Pie } from "react-chartjs-2";
 import useDetailedScore from "../../hooks/useDetailedScore";
+import CustomStepper from "../../components/CustomStepper";
 import styles from "./ScoringPage.module.css";
 
 ChartJS.register(
@@ -121,15 +122,9 @@ const ScoringPage = () => {
     return <p>Error fetching scores: {error.message}</p>;
   } else if (score.length > 0) {
     return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: "0px",
-        }}
-      >
-        <h1 className="text-4xl font-bold">Performance Score</h1>
+      <div className={styles.scoringPage}>
+        <CustomStepper stepIndex={2}/>
+        <h1 className={styles.header}>Your Scores</h1>
         <div className={styles.graph_row}>
           <div className={styles.graph_left}>
             <Line

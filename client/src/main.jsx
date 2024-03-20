@@ -10,6 +10,11 @@ import "./stylesheets/_reset.css";
 
 
 const theme = extendTheme({
+  colors: {
+    pink: {
+      500: "#db11fb",
+    },
+  },
     components: {
         Progress: {
           baseStyle: {

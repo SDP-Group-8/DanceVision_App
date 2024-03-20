@@ -23,9 +23,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  padding: 4rem;
-  justify-content: center;
+  padding: 1rem 2rem;
+  justify-content: space-between;
   background-image: radial-gradient(
       circle at center,
       rgba(255, 255, 255, 0.005) 0,
@@ -42,6 +41,7 @@
 .videoContainer {
   display: flex;
   gap: 2rem;
+  z-index: 1;
   height: fit-content;
   justify-content: space-around;
   align-items: end;
@@ -96,4 +96,8 @@
   opacity: 0.8;
   background: var(--purple-gradient);
   animation: spin 4s linear infinite, bounce 0.4s infinite alternate-reverse;
+}
+
+.stepper {
+  z-index: 1;
 }
