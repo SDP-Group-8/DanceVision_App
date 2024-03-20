@@ -8,7 +8,7 @@ const TimeLine = ({duration}) => {
   
   useEffect(() => {
         if (seconds >= duration) {
-          
+          navigate("/scoring")
           return
         }
         // Set up the timer
