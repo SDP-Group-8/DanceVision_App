@@ -13,7 +13,7 @@
   }
 
   100% {
-    transform: scale(1.1);
+    transform: scale(1.4);
   }
 }
 
@@ -88,12 +88,12 @@
 
 .gradient {
   position: absolute;
-  width: 25rem;
-  height: 25rem;
+  width: 30rem;
+  height: 30rem;
   z-index: 0;
   filter: blur(120px);
   left: calc(50% - 10rem);
   opacity: 0.8;
   background: var(--purple-gradient);
-  animation: spin 4s linear infinite, bounce 0.5s infinite alternate-reverse;
+  animation: spin 4s linear infinite, bounce 0.4s infinite alternate-reverse;
 }
