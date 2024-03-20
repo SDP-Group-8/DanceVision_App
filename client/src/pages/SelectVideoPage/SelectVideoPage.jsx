@@ -18,8 +18,6 @@ const Loader = ({message, isLoading=false}) => {
 function SelectVideoPage() {
     const { images, isLoading, error } = useFetchImages(import.meta.env.VITE_API_URL);
 
-    console.log(images)
-
     if (isLoading) {
       return <Loader message={"Fetching videos..."} isLoading/>;
     }
@@ -38,6 +36,7 @@ function SelectVideoPage() {
               key={image.basename}
               imgUrl={image.thumbnail_filename}
               title={image.basename}
+              basename={image.basename}
               videoName={image.video_filename}
             />)}
             

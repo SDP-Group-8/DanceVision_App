@@ -33,8 +33,6 @@ class StreamRelay:
 
         @self.receiver_pc.on("track")
         async def on_track(track):
-            score_channel = self.emitter_pc.createDataChannel("score")
-
             self.emitter_pc.addTrack(
                 PoseDetectionTrack(relay.subscribe(track), self.mediapipe)
             )

@@ -3,6 +3,7 @@ import { useState, useEffect} from 'react';
 
 const useDetailedScore = (url, options = {}) => {
   const [score, setScore] = useState([]);
+  const [avgScore, setAvgScore] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -11,19 +12,35 @@ const useDetailedScore = (url, options = {}) => {
       try {
         setIsLoading(true);
         const response = await axios.get(url + "/detailed_scores", { responseType: 'json', ...options });
-        const r_shoulder_l_shoulder_l_elbow = response.data.r_shoulder_l_shoulder_l_elbow;
-        console.log(r_shoulder_l_shoulder_l_elbow);
+        // const r_shoulder_l_shoulder_l_elbow = response.data.r_shoulder_l_shoulder_l_elbow;
+        // console.log(r_shoulder_l_shoulder_l_elbow);
         setScore(scores => [
           ...scores, 
-          {"r_shoulder_l_shoulder_l_elbow": response.data.r_shoulder_l_shoulder_l_elbow},
-          {"l_shoulder_l_elbow_l_wrist" : response.data.l_shoulder_l_elbow_l_wrist},
-          {"l_shoulder_r_shoulder_r_elbow": response.data.l_shoulder_r_shoulder_r_elbow},
-          {"r_shoulder_r_elbow_r_wrist": response.data.r_shoulder_r_elbow_r_wrist},
-          {"r_hip_l_hip_l_knee": response.data.r_hip_l_hip_l_knee},
-          {"l_hip_l_knee_l_ankle": response.data.l_hip_l_knee_l_ankle},
-          {"l_hip_r_hip_r_knee": response.data.l_hip_r_hip_r_knee},
-          {"r_hip_r_knee_r_ankle": response.data.r_hip_r_knee_r_ankle}
+          
+          {"left_shoulder": response.data.left_shoulder},
+          {"left_elbow" : response.data.left_elbow},
+          {"right_shoulder": response.data.right_shoulder},
+          {"right_elbow": response.data.right_elbow},
+          {"left_hip": response.data.left_hip},
+          {"left_knee": response.data.left_knee},
+          {"right_hip": response.data.right_hip},
+          {"right_knee": response.data.right_knee},
+          {"total_score": response.data.total_score},
         ]);
+
+        setAvgScore(avgScores => [
+          ...avgScores,
+          {"avg_score_over_time" : response.data.avg_score_over_time},
+          {"left_shoulder": response.data.left_shoulder},
+          {"left_elbow" : response.data.left_elbow},
+          {"right_shoulder": response.data.right_shoulder},
+          {"right_elbow": response.data.right_elbow},
+          {"left_hip": response.data.left_hip},
+          {"left_knee": response.data.left_knee},
+          {"right_hip": response.data.right_hip},
+          {"right_knee": response.data.right_knee},
+          
+        ])
       } catch (error) {
         setError(error);
       } finally {
@@ -33,7 +50,7 @@ const useDetailedScore = (url, options = {}) => {
     fetchScoreData();
   }, []);
 
-  return { score, isLoading, error  };
+  return { score, isLoading, error, avgScore  };
 };
 
 export default useDetailedScore;

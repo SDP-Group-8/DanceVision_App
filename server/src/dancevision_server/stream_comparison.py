@@ -3,19 +3,17 @@ from __future__ import annotations
 from typing import Callable
 
 from aiortc import RTCPeerConnection
-from aiortc.contrib.media import MediaRelay
-from aiortc.contrib.media import MediaPlayer
-
+from aiortc.contrib.media import MediaRelay, MediaPlayer
 from pose_estimation.mediapipe import MediaPipe
-from aiortc.rtcrtpsender import RTCRtpSender
 
 from dancevision_server.pose_detection_track import PoseDetectionTrack
 from dancevision_server.peer_connection import PeerConnnection
 from dancevision_server.host_identifiers import SERVER_IDENTIFIER, RASPBERRY_PI_IDENTIFIER
+from dancevision_server.recorder import Recorder
 
 class StreamComparison:
 
-    def __init__(self, address: str, port: int, parameter_path: str, on_pose_detections: Callable | None = None, **kwargs):
+    def __init__(self, address: str, port: int, parameter_path: str, recorder: Recorder, on_pose_detections: Callable | None = None, **kwargs):
         relay = MediaRelay()
 
         self.receiver_pc = RTCPeerConnection()
@@ -24,6 +22,8 @@ class StreamComparison:
         self.emitter_pc = RTCPeerConnection()
         self.emitter_pc.addTransceiver("video", "sendonly")
         self.emitter_pc.addTransceiver("video", "sendonly")
+
+        self.recorder = recorder
 
         self.address = address
         self.port = port
@@ -35,6 +35,10 @@ class StreamComparison:
         async def on_track(track):
             player = MediaPlayer(**kwargs)
             self.emitter_pc.addTrack(player.video)
+            
+            if self.recorder:
+                self.recorder.addTrack(player.video)
+                await self.recorder.start()
 
             self.emitter_pc.addTrack(
                 PoseDetectionTrack(relay.subscribe(track, buffered=False), mediapipe, on_pose_detections)
@@ -43,14 +47,16 @@ class StreamComparison:
         @self.receiver_pc.on("connectionstatechange")
         async def on_receiver_state_changed():
             if self.receiver_pc.connectionState == "closed":
-                self.on_connection_closed()
+                await self.on_connection_closed()
 
         @self.emitter_pc.on("connectionstatechange")
         async def on_emitter_state_changed():    
             if self.emitter_pc.connectionState == "closed":
-                self.on_connection_closed()
+                await self.on_connection_closed()
 
-    def on_connection_closed(self):
+    async def on_connection_closed(self):
+        await self.recorder.stop()
+
         for id in SERVER_IDENTIFIER, RASPBERRY_PI_IDENTIFIER:
             PeerConnnection.register_connection_closed(self.address, self.port, id)
 
