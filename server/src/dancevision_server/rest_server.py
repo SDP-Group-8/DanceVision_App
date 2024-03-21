@@ -106,7 +106,7 @@ async def start_video(video_name: str, basename: str):
         stdout.readlines()
 
     if stream_address is not None:
-        launch_video_streamer(stream_address, stream_port, read_lines)
+        p1, p2 = launch_video_streamer(stream_address, stream_port, read_lines)
 
     if not no_ros:
         robot_controller.set_velocity(0.01)
@@ -140,20 +140,35 @@ async def start_video(video_name: str, basename: str):
 
     comparison = None # No clue why this is needed
 
-    if file is not None:
-        def on_connection_closed():            
+    def on_sender_connection_closed():            
+        if SERVER_IDENTIFIER in connection_offers:
             del connection_offers[SERVER_IDENTIFIER]
+
+        if SERVER_IDENTIFIER in connection_answers:
             del connection_answers[SERVER_IDENTIFIER]
 
+    if file is not None:
         args["file"] = file
-        comparison = StreamSender(on_connection_closed=on_connection_closed, **args)
+        comparison = StreamSender(on_connection_closed=on_sender_connection_closed, **args)
 
         answer = await comparison.run(offer)
         comparison.add_second_track(file=str(filepath))
         connection_answers[SERVER_IDENTIFIER] = answer
     else:
+        def on_connection_closed():
+            on_sender_connection_closed()
+            
+            if RASPBERRY_PI_IDENTIFIER in connection_offers:
+                del connection_offers[RASPBERRY_PI_IDENTIFIER]
+
+            if RASPBERRY_PI_IDENTIFIER in connection_answers:
+                del connection_answers[RASPBERRY_PI_IDENTIFIER]
+
+            p1.kill()
+            p2.kill()
+
         args["file"] = str(filepath)
-        comparison = StreamComparison(address, port, **args)
+        comparison = StreamComparison(address, port, on_connection_closed=on_connection_closed, **args)
         answer = await comparison.negotiate_sender(offer)
         connection_answers[SERVER_IDENTIFIER] = answer
 
@@ -186,10 +201,14 @@ async def get_detailed_scores():
     """
     global score_aggregator
 
-    results = score_aggregator.get_all_scores()
-    results["avg_score_over_time"] = []
+    if score_aggregator:
+        results = score_aggregator.get_all_scores()
+        print("got scores")
+        results["avg_score_over_time"] = []
 
-    return results
+        return results
+    
+    JSONResponse("", status_code=status.HTTP_409_CONFLICT)
 
 @rest_app.get("/user_video")
 async def get_user_video(video_name: str, attempt_datetime: str):
