@@ -1,6 +1,5 @@
 import useVideoFeed from '../../hooks/useVideoFeed';
 import styles from './DanceScreen.module.css';
-import { CountdownDonut } from "../../components/CountdownDonut";
 import ScoringPage from '../../pages/ScoringPage/ScoringPage.jsx';
 
 import { useLocation } from 'react-router-dom';
@@ -26,17 +25,6 @@ function DanceScreen(props) {
     // Access the duration property of the video element
     setVideoDuration(Math.round(event.target.duration));
   };
-
-  React.useEffect(() => {
-    const timeout = setTimeout(() => {
-      setShow(true)
-    }, countdown * 1000)
-
-    return () => clearTimeout(timeout)
-
-  }, [show])
-
-  if (!show) return <CountdownDonut initialSeconds={countdown}/>;
 
   return (
     isConnectionClosed ? <ScoringPage basename={state.basename} datetime={recordingDate} /> 

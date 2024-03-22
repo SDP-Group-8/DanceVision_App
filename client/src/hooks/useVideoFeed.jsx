@@ -10,6 +10,7 @@ const useVideoFeed = (url, basename, videoName, options = {}) => {
     const [isConnectionClosed, setConnectionClosed] = useState(false);
     const [recordingDate, setRecordingDate] = useState(false)
     const [latestScore, setLatestScore] = useState(0.0)
+    const [isInFrame, setInFrame] = useState(false)
 
     var config = {
         sdpSemantics: 'unified-plan'
@@ -33,14 +34,19 @@ const useVideoFeed = (url, basename, videoName, options = {}) => {
             
             pc.addTransceiver('video', { direction: 'recvonly' });
             pc.addTransceiver('video', { direction: 'recvonly' });
-            const channel = pc.createDataChannel("score")
+            const score_channel = pc.createDataChannel("score")
+            const status_channel = pc.createDataChannel("movement")
 
-            channel.onopen = (event) => {
-                channel.send("sending a message");
+            score_channel.onmessage = (event) => {
+                setLatestScore(event.data)
             };
-            channel.onmessage = (event) => {
-                console.log(event.data);
-            };
+
+            status_channel.onmessage = (event) => {
+                const message = JSON.parse(event.data)
+                if (message.ready) {
+                    setInFrame(true)
+                }
+            }
 
             const offer = await pc.createOffer()
             pc.setLocalDescription(offer);
@@ -115,7 +121,7 @@ const useVideoFeed = (url, basename, videoName, options = {}) => {
         }
     }, [])
 
-    return {liveVideoSource, recordedVideoSource, isVideoAvailable, isConnectionClosed, recordingDate, latestScore}
+    return {liveVideoSource, recordedVideoSource, isVideoAvailable, isConnectionClosed, recordingDate, latestScore, isInFrame}
 }
 
 export default useVideoFeed;

@@ -5,6 +5,7 @@ import SelectVideoPage from "./pages/SelectVideoPage/SelectVideoPage";
 import DanceScreen from "./components/DanceScreen/DanceScreen.jsx";
 import ScoringPage from "./pages/ScoringPage/ScoringPage.jsx";
 import SignInUpForm from "./pages/SignInUpForm/SignInUpForm.jsx";
+import CountdownPage from "./pages/CountdownPage/CountdownPage.jsx";
 
 import styles from "./App.module.css";
 
@@ -18,6 +19,7 @@ function App() {
           <Route path="/videos" element={<SelectVideoPage />}></Route>
           <Route path="/live_comparison" element={<DanceScreen />}></Route>
           <Route path="/scoring" element={<ScoringPage />}></Route>
+          <Route path="/countdown" element={<CountdownPage />}></Route>
         </Routes>
       </Router>
     </div>

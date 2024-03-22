@@ -42,6 +42,7 @@ file = None
 
 comparison = None
 score_aggregator = None
+planner = None
 
 no_ros = False
 robot_controller = None
@@ -87,6 +88,7 @@ async def start_video(video_name: str, basename: str):
     global file
     global comparison
     global score_aggregator
+    global planner
     global no_ros
     global stream_address
     global stream_port
@@ -108,9 +110,6 @@ async def start_video(video_name: str, basename: str):
     if stream_address is not None:
         p1, p2 = launch_video_streamer(stream_address, stream_port, read_lines)
 
-    if not no_ros:
-        robot_controller.set_velocity(0.01)
-
     model_path = os.environ[model_var_name]
 
     score_aggregator = ScoreAggregator()
@@ -120,9 +119,6 @@ async def start_video(video_name: str, basename: str):
             score, component_scores = score_estimator.find_score(0, pose_detections)
             score_channel.send_score_message(score)
             score_aggregator.add_scores(component_scores)
-
-        #callback = None if no_ros else lambda: robot_controller.set_velocity(0.1)
-        pass
 
     while SERVER_IDENTIFIER not in connection_offers:
         await asyncio.sleep(2)
@@ -135,7 +131,8 @@ async def start_video(video_name: str, basename: str):
     args = {
         "parameter_path": model_path,
         "recorder": recorder,
-        "on_pose_detections": callback
+        "on_pose_detections": callback,
+        "planner": planner
     }
 
     comparison = None # No clue why this is needed
@@ -203,7 +200,6 @@ async def get_detailed_scores():
 
     if score_aggregator:
         results = score_aggregator.get_all_scores()
-        print("got scores")
         results["avg_score_over_time"] = []
 
         return results
@@ -296,6 +292,7 @@ def run_app(app_address, app_port, app_no_ros=True, app_stream_address=None, app
     global stream_address
     global stream_port
     global file
+    global planner
 
     address = app_address
     port = app_port
@@ -306,7 +303,9 @@ def run_app(app_address, app_port, app_no_ros=True, app_stream_address=None, app
 
     if not no_ros:
         from robot_controller.robot_controller_node import RobotControllerNode
+        from dancevision_server.planners.basic_planner import BasicPlanner as Planner
         robot_controller = RobotControllerNode()
+        planner = Planner()
 
     thumbnails_dir = VideoSaver.get_video_directory()
     rest_app.mount("/thumbnails", StaticFiles(directory=thumbnails_dir / "thumbnails"))

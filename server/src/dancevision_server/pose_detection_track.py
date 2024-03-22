@@ -12,13 +12,13 @@ from pose_estimation.single_window import SingleWindow
 class PoseDetectionTrack(MediaStreamTrack):
     kind = "video"
 
-    def __init__(self, track, mediapipe: MediaPipe, on_pose_detections: Callable | None = None):
+    def __init__(self, track, mediapipe: MediaPipe, on_pose_detections: list[Callable] | None = None):
         super().__init__()  # don't forget this!
         self.track = track
         self.mediapipe = mediapipe
         self.on_pose_detections = on_pose_detections
 
-    def update_pose_callack(self, on_pose_detections: Callable):
+    def update_pose_callack(self, on_pose_detections: list[Callable]):
         self.on_pose_detections = on_pose_detections
 
     async def recv(self):
@@ -29,8 +29,8 @@ class PoseDetectionTrack(MediaStreamTrack):
         res = self.mediapipe.process_frame(img, int(frame.time * 1e3))
         if res:
             img = SingleWindow.draw_pose_on_image(img, res.to_normalized_landmarks())
-            if self.on_pose_detections:
-                self.on_pose_detections(res)
+            for callback in self.on_pose_detections:
+                callback(res)
 
         # rebuild a VideoFrame, preserving timing information
         new_frame = VideoFrame.from_ndarray(img, format="bgr24")

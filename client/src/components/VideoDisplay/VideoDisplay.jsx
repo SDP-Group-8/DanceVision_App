@@ -12,7 +12,7 @@ const VideoDisplay = ({imgUrl, title, basename, videoName}) => {
 
   const handleClick = async (e) => {
     e.preventDefault()
-    navigate("/live_comparison", { state: {basename: basename, videoName: videoName }} )
+    navigate("/countdown", { state: {basename: basename, videoName: videoName }} )
   }
 
   return(
