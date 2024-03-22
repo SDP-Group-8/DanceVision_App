@@ -12,7 +12,7 @@ function DanceScreen(props) {
   const { state } = useLocation();
 
   const [videoDuration, setVideoDuration] = useState(0);
-  const {liveVideoSource, recordedVideoSource, isVideoAvailable, isConnectionClosed, recordingDate} 
+  const {liveVideoSource, recordedVideoSource, isVideoAvailable, isConnectionClosed, recordingDate, latestScore} 
     = useVideoFeed(import.meta.env.VITE_API_URL, state.basename, state.videoName);
   const [show, setShow] = React.useState(false)
   const countdown = 5 // in seconds
@@ -48,7 +48,7 @@ function DanceScreen(props) {
         </div>
         <div className={styles.rightPanel}>
           <h1>Your Score</h1>  
-          <LiveScore score={35}/>    
+          <LiveScore score={latestScore}/>    
         </div>
         
       
