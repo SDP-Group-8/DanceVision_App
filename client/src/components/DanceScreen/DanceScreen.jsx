@@ -2,6 +2,8 @@ import useVideoFeed from '../../hooks/useVideoFeed';
 import styles from './DanceScreen.module.css';
 import { CountdownDonut } from "../../components/CountdownDonut";
 import ScoringPage from '../../pages/ScoringPage/ScoringPage.jsx';
+import LiveScore from '../LiveScore/LiveScore';
+import TimeLine from '../TimeLine.jsx'
 
 import { useLocation } from 'react-router-dom';
 import React, {useRef, useState} from 'react'
@@ -57,7 +59,8 @@ function DanceScreen(props) {
           <video ref={recordedVideos} autoPlay width="100%" ></video>
         </div>
         <div className={styles.rightPanel}>
-          <h1>Your Score</h1>      
+          <h1>Your Score</h1>  
+          <LiveScore score={35}/>    
         </div>
         
       
