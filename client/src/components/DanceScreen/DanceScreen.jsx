@@ -7,26 +7,22 @@ import TimeLine from '../TimeLine.jsx'
 import { useLocation } from 'react-router-dom';
 import React, {useRef, useState} from 'react'
 import CustomStepper from '../CustomStepper.jsx';
+import ScoreBar from '../ScoreBar/ScoreBar.jsx';
+import usePeerConnection from '../../hooks/usePeerConnection.jsx';
 
 function DanceScreen(props) {
   const { state } = useLocation();
 
   const [videoDuration, setVideoDuration] = useState(0);
-  const {liveVideoSource, recordedVideoSource, isVideoAvailable, isConnectionClosed, recordingDate, latestScore} 
-    = useVideoFeed(import.meta.env.VITE_API_URL, state.basename, state.videoName);
-  const [show, setShow] = React.useState(false)
-  const countdown = 5 // in seconds
+  const options = {basename: state.basename, videoName: state.videoName}
+  const {peerConnection, recordingDate} = usePeerConnection(import.meta.env.VITE_API_URL, true, options)
+  const {liveVideoSource, recordedVideoSource, isConnectionClosed} = useVideoFeed(peerConnection);
 
   const liveVideos = useRef(new MediaStream())
   const recordedVideos = useRef(new MediaStream())
 
   liveVideos.current.srcObject = liveVideoSource;
   recordedVideos.current.srcObject = recordedVideoSource;
-
-  const handleLoadedMetadata = (event) => {
-    // Access the duration property of the video element
-    setVideoDuration(Math.round(event.target.duration));
-  };
 
   return (
     isConnectionClosed ? <ScoringPage basename={state.basename} datetime={recordingDate} /> 
@@ -46,11 +42,7 @@ function DanceScreen(props) {
         <div className={styles.refVideo}>
           <video ref={recordedVideos} autoPlay width="100%" ></video>
         </div>
-        <div className={styles.rightPanel}>
-          <h1>Your Score</h1>  
-          <LiveScore score={latestScore}/>    
-        </div>
-        
+        <ScoreBar></ScoreBar>
       
       </div>
       <div className={styles.timeline}>

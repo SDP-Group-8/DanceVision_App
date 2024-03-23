@@ -47,10 +47,9 @@ class StreamSender:
         def on_datachannel(channel):
             if channel.label == "score":
                 self.score_channel = ScoreChannel(channel)
+                self.pose_detection_track.update_pose_callack([on_pose_detection, partial(on_pose_detections, self.score_channel)])
             elif channel.label == "movement":
                 self.movement_channel = MovementChannel(channel)
-            
-            self.pose_detection_track.update_pose_callack([on_pose_detection, partial(on_pose_detections, self.score_channel)])
 
         @self.emitter_pc.on("connectionstatechange")
         async def on_state_changed():

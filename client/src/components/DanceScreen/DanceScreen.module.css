@@ -75,11 +75,6 @@
   gap: 2rem;
   justify-content: space-between;
 }
-.rightPanel {
-  width: 20vw;
-  height: 100%;
-  z-index: 1;
-}
 
 .timeline {
   width: 100%;
