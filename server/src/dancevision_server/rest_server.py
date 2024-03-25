@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import os
 import uvicorn
@@ -31,6 +31,7 @@ from dancevision_server.score_channel import ScoreChannel
 from dancevision_server.score_aggregator import ScoreAggregator
 
 from dancevision_startup.launch_video_streamer import launch_video_streamer
+from dancevision_server import mongoServer
 
 rest_app = FastAPI()
 logger = logging.getLogger("dancevision_server.rest_server")
@@ -198,6 +199,38 @@ async def get_user_video(video_name: str, attempt_datetime: str):
     """
     #FileResponse(path, media_type="video/mp4" )
     return {"name": video_name}
+
+@rest_app.post("/login")
+async def login_endpoint(request : Request):
+    data = await request.json()
+    print(data)
+    email = data.get("email")
+    password = data.get("password")
+    return mongoServer.login(email, password)
+
+@rest_app.post("/register")
+async def register_endpoint(request : Request):
+    data = await request.json()
+    print(data)
+    email = data.get("email")
+    password = data.get("password")
+    name = data.get("name")
+    userName = data.get("username")
+    if mongoServer.email_exists(email):
+        return {'status': 'failure', 'reason': 'Email already in use'}
+    elif mongoServer.user_name_exists(userName):
+        return { 'status': 'failure', 'reason': 'Username already exists' }
+    else:
+        result, login_id = mongoServer.register(email, password)
+        mongoServer.add_personal_information(userName, login_id, name, email )
+        return result
+
+@rest_app.post("/personal_details")
+async def personal_details_endpoint(request : Request):
+    data = await request.json()
+    result = mongoServer.get_personal_information(data.get("username"))
+    return  result
+    
     
 
 @rest_app.post("/offer")

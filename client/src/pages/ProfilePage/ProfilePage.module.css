@@ -1,0 +1,47 @@
+.body {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: center; */
+    padding: 2rem 4rem;
+    gap: 2rem;
+    background: linear-gradient(var(--rotate), #db11fb, #2d4af3);
+    animation: rotation 15s linear infinite;
+  }
+
+  .profile_container{
+    padding: 2rem;
+    width: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;   
+  }
+
+  .profile_information{
+    /* background-color: antiquewhite; */
+    padding: 0;
+    margin: 0;
+    height: 100%;
+  }
+
+  .profile_heading{
+    text-align: left;
+    color: black;
+    padding-bottom: 2rem;
+  }
+
+
+  /* .avatar_container{
+    width: 30%;
+    background-color: #db11fb;
+    display: flex;
+    
+    align-items: center;
+    justify-content:right;
+  } */
+  .user_avatar{
+    width: 100%;
+    height: 100%;
+  }

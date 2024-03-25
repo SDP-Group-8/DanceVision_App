@@ -7,6 +7,7 @@ import { Popup } from "../../components/Popup";
 import styles from './HomePage.module.css'
 import logo from '../../assets/logo.png'
 import { useState } from "react";
+import { getUserInfo } from '../../utils/localstorage';
 
 const HomePage = () => {
     const defaultPopup = {success:false, error:{status:false, message:""}, show:false, loading:false}
@@ -14,6 +15,7 @@ const HomePage = () => {
     const changePopup = (data) => {
         setShowPopup(data)
     }
+    console.log("Local storage : ",getUserInfo())
     return(
         <>
             <div className={styles.HomePage}>

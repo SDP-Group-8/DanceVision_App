@@ -1,0 +1,16 @@
+.bosy{
+    width: 100%;
+    height: 100%;
+    background-color: aqua;
+}
+
+.card{
+    height: 20rem;
+    width: 80vw;
+    padding: 2rem;
+
+}
+
+.video{
+    width: 50%;
+}
