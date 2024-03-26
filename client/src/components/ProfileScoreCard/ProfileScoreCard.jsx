@@ -42,7 +42,7 @@ const ProfileScoreCard = ({refVideoName, timestamp, score, attempt, id}) => {
             {/* <Heading size="md">The perfect latte</Heading> */}
 
             <Text py="2">
-              {refVideoName}
+              Reference Video : {refVideoName}
             </Text>
             <Text py="2">
               Score: {score}%
@@ -50,7 +50,7 @@ const ProfileScoreCard = ({refVideoName, timestamp, score, attempt, id}) => {
             <Text py="2">
               Attempt : {attempt}
             </Text>
-            <Text py="2">
+            <Text pt="2">
               Date and Time : {timestamp}
             </Text>
           </CardBody>

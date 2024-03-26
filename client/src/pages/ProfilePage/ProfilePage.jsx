@@ -23,10 +23,10 @@ const ProfilePage = () => {
     import.meta.env.VITE_API_URL,
     userName
   );
-  const { data } = useUserDanceScores(userName);
+  const { score } = useUserDanceScores(userName);
   useEffect(() => {
-    console.log(data); 
-  }, [data]);
+    console.log(score);
+  }, [score]);
 
   return (
     <div className={styles.body}>
@@ -43,7 +43,7 @@ const ProfilePage = () => {
             <Text py="2">Name: {name}</Text>
             <Text py="2">User Name: {userName}</Text>
             <Text py="2">
-              Email: {email} {data}
+              Email: {email} 
             </Text>
           </CardBody>
         </Stack>
@@ -58,28 +58,31 @@ const ProfilePage = () => {
         </div>
       </Card>
 
-      <ProfileScoreCard
+      {/* <ProfileScoreCard
         refVideoName={"Finesse Step"}
         score={"90"}
         attempt={"2"}
         timestamp={"21st March 2024 23:20:25"}
         id={"6602a6b812ed1e46fa7180fc"}
-      ></ProfileScoreCard>
+      ></ProfileScoreCard> */}
 
       <div>
-        {data &&
-          data.length > 0 &&
-          data.map((item, index) => (
+        {score && score.length > 0 ? (
+          score.map((item, index) => (
             <ProfileScoreCard
               key={index}
               refVideoName={item.ref_video_name}
-              score={calculateScore(item.avgScores)} // You need to implement calculateScore function
-              attempt={index + 1} // Assuming attempt starts from 1
-              timestamp={formatTimestamp(item.time_stamp)} // You need to implement formatTimestamp function
+              score={item.avgScores.total_score} 
+              attempt= {'1'}
+              timestamp={item.time_stamp} 
               id={item._id}
             />
-          ))}
+          ))
+        ) : (
+          <p>Loading scores...</p>
+        )}
       </div>
+
     </div>
   );
 };
