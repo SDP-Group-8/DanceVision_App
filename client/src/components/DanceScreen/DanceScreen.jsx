@@ -38,7 +38,7 @@ function DanceScreen(props) {
   useEffect(() => {
     const fetchId = async () => {
     try {
-      const params = new URLSearchParams({"username": username})
+      const params = new URLSearchParams({"username": username, "dance_name": props.dance_name, "datetime": recordingDate})
       const response = await axios.get(import.meta.env.VITE_API_URL + "/detailed_scores?" + params, { responseType: 'json' });  
       if(response.data.id){
         navigate(`/scoring?id=${response.data.id}`)

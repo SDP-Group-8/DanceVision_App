@@ -17,7 +17,7 @@ const CountdownPage = () => {
     const { isInFrame } = useStatusChannel(statusChannel)
 
     if(isInFrame){
-        return <DanceScreen/>
+        return <DanceScreen dance_name={state.basename}/>
     }
 
     return <Spinner/>
