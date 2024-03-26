@@ -97,3 +97,30 @@
 .stepper {
   z-index: 1;
 }
+
+@media (max-width: 550px) {
+  .liveVideo video {
+    position: absolute;
+    width: 80px;
+    z-index: 1;
+    bottom: 2rem;
+    right: 2rem;
+    border-radius: 0;
+  }
+
+  .refVideo,
+  .refVideo video {
+    position: absolute;
+    height: 177vw;
+    width: 100vw;
+    z-index: -1;
+    max-height: 100vh;
+    top: 0;
+    left: 0;
+    border-radius: 0;
+  }
+
+  .stepper {
+    display: none;
+  }
+}
