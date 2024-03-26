@@ -1,0 +1,126 @@
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes bounce {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.4);
+  }
+}
+
+.danceScreen {
+  overflow: hidden;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 2rem;
+  justify-content: space-between;
+  background-image: radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.005) 0,
+      rgba(255, 255, 255, 0.005) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 100px 100px;
+  background-attachment: fixed;
+  background-color: #1f1f1f;
+}
+
+.videoContainer {
+  display: flex;
+  gap: 2rem;
+  z-index: 1;
+  height: fit-content;
+  justify-content: space-around;
+  align-items: end;
+}
+
+.liveVideo video,
+.refVideo video {
+  object-fit: cover;
+  border-radius: 1rem;
+  aspect-ratio: 9/16;
+  max-height: 70vh;
+}
+
+.liveVideo,
+.refVideo {
+  height: 100%;
+  border-radius: 1rem;
+  aspect-ratio: 9/16;
+  z-index: 1;
+}
+
+.refVideo video {
+  max-height: 90vh;
+}
+
+.leftPanel {
+  display: flex;
+  height: 100%;
+  z-index: 1;
+  flex-direction: column;
+  gap: 2rem;
+  justify-content: space-between;
+}
+
+.timeline {
+  width: 100%;
+  z-index: 1;
+}
+
+.gradient {
+  position: absolute;
+  width: 30rem;
+  height: 30rem;
+  z-index: 0;
+  filter: blur(120px);
+  top: calc(50% - 15rem);
+  left: calc(50% - 15rem);
+  opacity: 0.8;
+  background: var(--purple-gradient);
+  animation: spin 4s linear infinite, bounce 0.4s infinite alternate-reverse;
+}
+
+.stepper {
+  z-index: 1;
+}
+
+@media (max-width: 550px) {
+  .liveVideo video {
+    position: absolute;
+    width: 80px;
+    z-index: 1;
+    bottom: 2rem;
+    right: 2rem;
+    border-radius: 0;
+  }
+
+  .refVideo,
+  .refVideo video {
+    position: absolute;
+    height: 177vw;
+    width: 100vw;
+    z-index: -1;
+    max-height: 100vh;
+    top: 0;
+    left: 0;
+    border-radius: 0;
+  }
+
+  .stepper {
+    display: none;
+  }
+}
