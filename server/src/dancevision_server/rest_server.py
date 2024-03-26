@@ -228,6 +228,12 @@ async def personal_details_endpoint(request : Request):
     data = await request.json()
     result = mongoServer.get_personal_information(data.get("username"))
     return  result
+
+@rest_app.get("/userAllDanceScores")
+async def user_all_dance_score_endpoint(username: str):
+    result = mongoServer.get_all_dance_score(username)
+    return result
+
     
     
 

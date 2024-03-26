@@ -13,7 +13,7 @@ import {
 import styles from './ProfileScoreCard.module.css'
 import { useNavigate } from "react-router-dom";
 
-const ProfileScoreCard = ({refVideoName, timestamp, score, attempt, id='6602a6b812ed1e46fa7180fc' }) => {
+const ProfileScoreCard = ({refVideoName, timestamp, score, attempt, id}) => {
   const navigate = useNavigate();
 
   const handleSubmit =( ) =>
