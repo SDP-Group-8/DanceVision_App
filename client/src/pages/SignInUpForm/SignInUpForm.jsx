@@ -26,15 +26,6 @@ function SignInUpForm() {
     setIsSignUpActive(false);
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log("Submitted");
-    console.log(name);
-    console.log(email);
-    console.log(password);
-    navigate("/home");
-  };
-
   const handleLogin = async (event) => {
     event.preventDefault();
     console.log("Submitted");

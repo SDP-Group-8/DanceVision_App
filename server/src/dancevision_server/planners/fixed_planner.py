@@ -16,5 +16,5 @@ class FixedPlanner(Planner):
         result = self.get_result()
         if result != False:
             return True
-        self.__move_base(0.0, 0.0, 0.1)
-        self.robot_controller.set_height(50.0)
+        self.__move_base(1.0, 0.0, 0.0)
+        self.robot_controller.set_height(300.0)

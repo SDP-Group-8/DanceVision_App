@@ -82,4 +82,4 @@ def get_all_dance_score(user_name):
     list_data = list(all_objects)
     for data in list_data:
         data['_id'] = str(data['_id'])
-    return list_data
+    return { "data": list_data }
