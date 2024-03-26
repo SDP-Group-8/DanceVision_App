@@ -45,7 +45,7 @@ const ProfileScoreCard = ({refVideoName, timestamp, score, attempt, id}) => {
               Reference Video : {refVideoName}
             </Text>
             <Text py="2">
-              Score: {score}%
+              Score: {score.toFixed(2)}%
             </Text>
             <Text py="2">
               Attempt : {attempt}

@@ -107,6 +107,10 @@ const data = {
   ],
 };
 
+const roundNumber = (number) => {
+  return number.toFixed(2)
+}
+
 const AvgScores = (AvgScore) => {
   console.log(AvgScore.avgScore);
 
@@ -125,7 +129,7 @@ const AvgScores = (AvgScore) => {
           <div className={styles.left_up}>
             <div className={styles.progress_wrapper}>
               <Progress
-                number={AvgScore.avgScore[1].left_shoulder}
+                number={roundNumber(AvgScore.avgScore[1].left_shoulder)}
                 width={100}
                 height={100}
                 isTextShown={true}
@@ -136,7 +140,7 @@ const AvgScores = (AvgScore) => {
             </div>
             <div className={styles.progress_wrapper}>
               <Progress
-                number={AvgScore.avgScore[2].left_elbow}
+                number={roundNumber(AvgScore.avgScore[2].left_elbow)}
                 width={100}
                 height={100}
                 isTextShown={true}
@@ -147,7 +151,7 @@ const AvgScores = (AvgScore) => {
             </div>
             <div className={styles.progress_wrapper}>
               <Progress
-                number={AvgScore.avgScore[3].right_shoulder}
+                number={roundNumber(AvgScore.avgScore[3].right_shoulder)}
                 width={100}
                 height={100}
                 isTextShown={true}
@@ -158,7 +162,7 @@ const AvgScores = (AvgScore) => {
             </div>
             <div className={styles.progress_wrapper}>
               <Progress
-                number={AvgScore.avgScore[4].right_elbow}
+                number={roundNumber(AvgScore.avgScore[4].right_elbow)}
                 width={100}
                 height={100}
                 isTextShown={true}
@@ -172,7 +176,7 @@ const AvgScores = (AvgScore) => {
           <div className={styles.left_down}>
             <div className={styles.progress_wrapper}>
               <Progress
-                number={AvgScore.avgScore[5].left_hip}
+                number={roundNumber(AvgScore.avgScore[5].left_hip)}
                 width={100}
                 height={100}
                 isTextShown={true}
@@ -184,7 +188,7 @@ const AvgScores = (AvgScore) => {
 
             <div className={styles.progress_wrapper}>
               <Progress
-                number={AvgScore.avgScore[6].left_knee}
+                number={roundNumber(AvgScore.avgScore[6].left_knee)}
                 width={100}
                 height={100}
                 isTextShown={true}
@@ -195,7 +199,7 @@ const AvgScores = (AvgScore) => {
             </div>
             <div className={styles.progress_wrapper}>
               <Progress
-                number={AvgScore.avgScore[7].right_hip}
+                number={roundNumber(AvgScore.avgScore[7].right_hip)}
                 width={100}
                 height={100}
                 isTextShown={true}
@@ -206,7 +210,7 @@ const AvgScores = (AvgScore) => {
             </div>
             <div className={styles.progress_wrapper}>
               <Progress
-                number={AvgScore.avgScore[8].right_knee}
+                number={roundNumber(AvgScore.avgScore[8].right_knee)}
                 width={100}
                 height={100}
                 isTextShown={true}
