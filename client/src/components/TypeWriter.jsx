@@ -26,7 +26,7 @@ const Typewriter = ({ text, speed }) => {
     const displayText = useTypewriter(text, speed);
   
     return (
-        <p>{displayText}</p>
+        <p style={{ fontSize: "40px" }}>{displayText}</p>
     )
     
   };
