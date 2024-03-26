@@ -21,6 +21,8 @@ const ProfileScoreCard = ({refVideoName, timestamp, score, attempt, id}) => {
     navigate(`/scoring?id=${id}`)
   }
   
+  const date = new Date(timestamp)
+
   return (
     <div className={styles.body}>
       <Card
@@ -45,13 +47,13 @@ const ProfileScoreCard = ({refVideoName, timestamp, score, attempt, id}) => {
               Reference Video : {refVideoName}
             </Text>
             <Text py="2">
-              Score: {score}%
+              Score: {score.toFixed(2)}%
             </Text>
             <Text py="2">
               Attempt : {attempt}
             </Text>
             <Text pt="2">
-              Date and Time : {timestamp}
+              Date and Time : {date.toLocaleDateString()} {date.toLocaleTimeString()}
             </Text>
           </CardBody>
 

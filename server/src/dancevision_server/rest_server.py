@@ -158,7 +158,7 @@ async def get_thumbnails():
     return {"thumbnails": [thumbnail.to_dict() for thumbnail in names]}
 
 @rest_app.get("/detailed_scores")
-async def get_detailed_scores(username: str):
+async def get_detailed_scores(username: str, dance_name: str, datetime: str):
     """
     Return detailed scores and information about frames compared so far
     :return A list of scores for each Keypoint statistics
@@ -176,8 +176,8 @@ async def get_detailed_scores(username: str):
     results = {
         'avgScores': avgScores,
         'detailed_scores' : detailed_scores,
-        "ref_video_name" : "fineese_step",
-        "time_stamp" : "2024-03-20 20:18:34"
+        "ref_video_name" : dance_name,
+        "time_stamp" : datetime
     }
 
     video_id = mongoServer.store_dance_score(username, results)

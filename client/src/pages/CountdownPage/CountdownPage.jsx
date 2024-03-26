@@ -21,10 +21,9 @@ const CountdownPage = () => {
   initial = true;
 
   const { isInFrame } = useStatusChannel(statusChannel);
-
-  if (isInFrame) {
-    return <DanceScreen />;
-  }
+    if(isInFrame){
+        return <DanceScreen dance_name={state.basename}/>
+    }
 
   return (
     <div className={styles.body}>
