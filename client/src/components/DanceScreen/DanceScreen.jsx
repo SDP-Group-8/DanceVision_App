@@ -9,10 +9,13 @@ import CustomStepper from '../CustomStepper.jsx';
 import ScoreBar from '../ScoreBar/ScoreBar.jsx';
 import usePeerConnection from '../../hooks/usePeerConnection.jsx';
 import useReferenceVideo from '../../hooks/useReferenceVideo.jsx';
+import CountdownDonut from '../CountdownDonut/CountdownDonut.jsx';
 
 let initial = false
 
 function DanceScreen(props) {
+  const [ started, setStarted ] = useState(false)
+  const countdown = 6;
   const { state } = useLocation();
 
   const [videoDuration, setVideoDuration] = useState(0);
@@ -28,9 +31,17 @@ function DanceScreen(props) {
   liveVideos.current.srcObject = liveVideoSource;
   recordedVideos.current.srcObject = recordedVideoSource;
 
-  return (
-    isConnectionClosed ? <ScoringPage basename={state.basename} datetime={recordingDate} /> 
-    : <div className={styles.danceScreen}>
+  setTimeout(() => {
+    setStarted(true)
+  }, countdown * 1000)
+
+  if(!started){
+    return <CountdownDonut initialSeconds={countdown}/>
+  }else if(isConnectionClosed){
+    return <ScoringPage basename={state.basename} datetime={recordingDate} /> 
+  }else{
+    return (
+    <div className={styles.danceScreen}>
       <div className={styles.stepper}>
 
       <CustomStepper stepIndex={1}/>
@@ -56,8 +67,8 @@ function DanceScreen(props) {
       <div className={styles.gradient}></div>
       
     </div>
-
-  );
+    )
+  }
 }
 
 export default DanceScreen;

@@ -9,8 +9,6 @@ import usePeerReceiver from "../../hooks/usePeerReceiver";
 let initial = false
 
 const CountdownPage = () => {
-    const countdown = 5;
-    const [ started, setStarted ] = useState(false)
     const { state } = useLocation();
 
     const { statusChannel } = usePeerReceiver(import.meta.env.VITE_API_URL, !initial, {videoName: state.videoName})
@@ -18,26 +16,8 @@ const CountdownPage = () => {
     
     const { isInFrame } = useStatusChannel(statusChannel)
 
-    React.useEffect(() => {
-        let timeout = undefined
-        
-        if(isInFrame){
-            timeout = setTimeout(() => {
-                setStarted(true)
-            }, countdown * 1000)
-        }
-
-        return () => {
-            if(timeout !== undefined){
-                clearTimeout(timeout)
-            }   
-        }
-    }, [isInFrame])
-
-    if(started){
+    if(isInFrame){
         return <DanceScreen/>
-    }else if(isInFrame){
-        return <CountdownDonut initialSeconds={countdown}/>
     }
 
     return <Spinner/>
