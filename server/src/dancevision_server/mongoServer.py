@@ -68,7 +68,8 @@ def get_personal_information(user_name):
     
 
 def store_dance_score(user_name, data):
-    db_dance_scores[user_name].insert_one(data)
+    id = db_dance_scores[user_name].insert_one(data)
+    return str(id)
 
 def get_dance_score(user_name, dance_id):
     object_id = ObjectId(dance_id)

@@ -53,6 +53,8 @@ stream_port = None
 connection_offers = {}
 connection_answers = {}
 
+current_video_id = ''
+
 logger = logging.Logger("rest_server")
 
 rest_app.add_middleware(
@@ -186,11 +188,30 @@ async def get_detailed_scores():
     :return A list of scores for each Keypoint statistics
     """
     global score_aggregator
+    global current_video_id
 
-    results = score_aggregator.get_all_scores()
-    results["avg_score_over_time"] = []
+    detailed_scores = score_aggregator.get_all_scores()
+    avgScores = score_aggregator.get_avg_scores()
+    accuracy_over_time = score_aggregator.calculate_accuracy_over_time()
+    total_score = score_aggregator.get_total_score()
+    detailed_scores["avg_score_over_time"] = accuracy_over_time
+    avgScores['total_score'] = total_score
 
-    return results
+    results = {
+        'avgScores': avgScores,
+        'detailed_scores' : detailed_scores,
+        "ref_video_name" : "fineese_step",
+        "time_stamp" : "2024-03-20 20:18:34"
+    }
+
+    video_id = mongoServer.store_dance_score(results)
+    current_video_id = video_id
+
+    return current_video_id
+
+@rest_app.get("dance_id")
+async def dance_id_endpoint():
+    return {"id" :current_video_id}
 
 @rest_app.get("/user_video")
 async def get_user_video(video_name: str, attempt_datetime: str):
