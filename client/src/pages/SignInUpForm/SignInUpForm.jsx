@@ -79,7 +79,7 @@ function SignInUpForm() {
     try {
       const response = await axios.post(
         import.meta.env.VITE_API_URL + "/register",
-        { name: name, email: email, password: password },
+        { name: name, email: email, password: password, username : userName},
         { responseType: "json" }
       );
 

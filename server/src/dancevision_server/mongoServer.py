@@ -78,8 +78,14 @@ def get_dance_score(user_name, dance_id):
     print(dance_data)
     return dance_data
 
-def get_all_dance_score(username):
-    pass
+def get_all_dance_score(user_name):
+    all_objects = db_dance_scores[user_name].find()
+    list_data = list(all_objects)
+    for data in list_data:
+        data['_id'] = str(data['_id'])
+    return list_data
+
+
 
 
 def test_data():
