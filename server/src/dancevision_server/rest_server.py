@@ -200,6 +200,14 @@ async def get_user_video(video_name: str, attempt_datetime: str):
     #FileResponse(path, media_type="video/mp4" )
     return {"name": video_name}
 
+@rest_app.post("/db_detailed_score")
+async def db_detailed_score_endpoint(request : Request):
+    data = await request.json()
+    print(data)
+    username = data.get("username")
+    id = data.get("id")
+    return mongoServer.get_dance_score(username, id)
+
 @rest_app.post("/login")
 async def login_endpoint(request : Request):
     data = await request.json()

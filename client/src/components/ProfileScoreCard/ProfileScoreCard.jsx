@@ -11,8 +11,16 @@ import {
   Avatar,
 } from "@chakra-ui/react";
 import styles from './ProfileScoreCard.module.css'
+import { useNavigate } from "react-router-dom";
 
-const ProfileScoreCard = ({refVideoName, timestamp, score, attempt }) => {
+const ProfileScoreCard = ({refVideoName, timestamp, score, attempt, id='6602a6b812ed1e46fa7180fc' }) => {
+  const navigate = useNavigate();
+
+  const handleSubmit =( ) =>
+  {
+    navigate(`/scoring?id=${id}`)
+  }
+  
   return (
     <div className={styles.body}>
       <Card
@@ -48,7 +56,7 @@ const ProfileScoreCard = ({refVideoName, timestamp, score, attempt }) => {
           </CardBody>
 
           <CardFooter>
-            <Button variant="solid" colorScheme="blue">
+            <Button variant="solid" colorScheme="blue" onClick={handleSubmit}>
               Check Score
             </Button>
           </CardFooter>

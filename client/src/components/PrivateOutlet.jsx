@@ -1,5 +1,4 @@
 import { Outlet, useNavigate } from 'react-router-dom';
-// import { getUserInfo } from '../../service/auth.service';
 import { useEffect } from 'react';
 import { getUserInfo } from '../utils/localstorage';
 

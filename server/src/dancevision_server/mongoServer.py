@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
+from bson.objectid import ObjectId
 
 load_dotenv()
 
@@ -10,6 +11,7 @@ print("Db key" , db_key)
 client = MongoClient(db_key, ssl=True, tlsAllowInvalidCertificates=True)
 
 db_user_data = client.get_database("user_data")
+db_dance_scores = client.get_database('dance_scores')
 
 def login(email, password):
     if not email_exists(email=email):
@@ -63,3 +65,64 @@ def get_personal_information(user_name):
             "email" : d['email']
         }
         return data    
+    
+
+def store_dance_score(user_name, data):
+    db_dance_scores[user_name].insert_one(data)
+
+def get_dance_score(user_name, dance_id):
+    object_id = ObjectId(dance_id)
+    dance_data = db_dance_scores[user_name].find_one({'_id': object_id})
+    dance_data['_id'] = str(dance_data['_id']) # convert ObjectId to string for json output
+    print(dance_data)
+    return dance_data
+
+def get_all_dance_score(username):
+    pass
+
+
+def test_data():
+    detailed_scores ={
+        "left_shoulder" : [10,20,30,40,50,60],
+        "right_shoulder" : [10,20,30,40,50,60],
+        "left_elbow" : [10,20,30,40,50,60],
+        "right_elbow" : [10,20,30,40,50,60],
+        "left_wrist" : [10,20,30,40,50,60],
+        "right_wrist" : [10,20,30,40,50,60],
+        "left_hip" : [10,20,30,40,50,60],
+        "right_hip" : [10,20,30,40,50,60],
+        "left_knee" : [10,20,30,40,50,60],
+        "right_knee" : [10,20,30,40,50,60],
+        "left_ankle" : [10,20,30,40,50,60],
+        "right_ankle" : [10,20,30,40,50,60],
+        "avg_score_over_time" : [10,20,30,40,50,60]
+    }
+
+    avgScores = {
+        "left_shoulder" : 67,
+        "right_shoulder" : 67,
+        "left_elbow" : 67,
+        "right_elbow" : 67,
+        "left_wrist" : 67,
+        "right_wrist" : 67,
+        "left_hip" : 67,
+        "right_hip" : 67,
+        "left_knee" : 67,
+        "right_knee" : 67,
+        "left_ankle" : 67,
+        "right_ankle" : 67,
+        "total_score" : 90
+    }
+
+    data ={ "avgScores" : avgScores,
+           "detailed_scores" : detailed_scores,
+           "ref_video_name" : "fineese_step",
+           "time_stamp" : "2024-03-20 20:18:34"}
+    
+    db_dance_scores["admin2"].insert_one(data)
+
+
+
+    
+# test_data()
+get_dance_score('admin2', '6602a6b812ed1e46fa7180fc')
