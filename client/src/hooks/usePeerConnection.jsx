@@ -27,11 +27,11 @@ const usePeerConnection = (url, negotiate = false, options = {}) => {
 
             if(!reloaded){
                 await axios.delete(import.meta.env.VITE_API_URL + "/clear-connection")
+                await axios.get(import.meta.env.VITE_API_URL + "/open-window")
                 reloaded = true
             }
-            await axios.get(import.meta.env.VITE_API_URL + "/open-window")
             const res = axios.get(import.meta.env.VITE_API_URL + "/start-reference?" + params)
-            const response = await establishConnection(pc, url, res, true)
+            const response = await establishConnection(pc, url, res)
             setRecordingDate(response.data.datetime)
         };
         if(negotiate){

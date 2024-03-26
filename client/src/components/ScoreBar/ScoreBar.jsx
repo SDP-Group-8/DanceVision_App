@@ -9,7 +9,7 @@ const ScoreBar = (props) => {
     return (
         <div className={styles.rightPanel}>
             <h1>Your Score</h1>  
-            <LiveScore score={100}/>    
+            <LiveScore score={latestScore}/>    
         </div>
     )
 }

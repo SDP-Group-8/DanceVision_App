@@ -1,11 +1,7 @@
 import useVideoFeed from '../../hooks/useVideoFeed';
 import styles from './DanceScreen.module.css';
 import ScoringPage from '../../pages/ScoringPage/ScoringPage.jsx';
-import LiveScore from '../LiveScore/LiveScore';
 import TimeLine from '../TimeLine.jsx'
-
-import liveVid from '../../assets/sample1.mp4';
-import refVid from '../../assets/sample3.mp4';
 
 import { useLocation } from 'react-router-dom';
 import React, {useRef, useState} from 'react'
@@ -24,7 +20,7 @@ function DanceScreen(props) {
   let {peerConnection, recordingDate, scoreChannel} = usePeerConnection(import.meta.env.VITE_API_URL, !initial, options)
   initial = true
   const {liveVideoSource, isConnectionClosed} = useVideoFeed(peerConnection);
-  const {recordedVideoSource} = useReferenceVideo(peerConnection, {basename: state.basename})
+  const {recordedVideoSource} = useReferenceVideo(peerConnection)
 
   const liveVideos = useRef(new MediaStream())
   const recordedVideos = useRef(new MediaStream())
@@ -42,13 +38,13 @@ function DanceScreen(props) {
       <div className={styles.videoContainer}>
         <div className={styles.leftPanel}>
           <div className={styles.liveVideo}>
-            <video src={liveVid} autoPlay width="100%"></video>
+            <video ref={liveVideos} autoPlay width="100%"></video>
           </div>
           
         </div>
 
         <div className={styles.refVideo}>
-          <video src={refVid} autoPlay width="100%" ></video>
+          <video ref={recordedVideos} autoPlay width="100%" ></video>
         </div>
         <ScoreBar scoreChannel={scoreChannel}></ScoreBar>
       

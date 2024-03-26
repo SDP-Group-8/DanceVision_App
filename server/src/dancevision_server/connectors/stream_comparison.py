@@ -46,13 +46,13 @@ class StreamComparison(Connector):
         async def on_track(track):
             self.player = MediaPlayer(**kwargs)
             self.emitter_pc.addTrack(self.player.video)
-            
-            if self.recorder:
-                self.recorder.addTrack(self.player.video)
-                await self.recorder.start()
 
             self.pose_detection_track = PoseDetectionTrack(relay.subscribe(track, buffered=False), mediapipe, on_pose_detections)
             self.emitter_pc.addTrack(self.pose_detection_track)
+
+            if self.recorder:
+                self.recorder.addTrack(track)
+                await self.recorder.start()
 
         @self.receiver_pc.on("connectionstatechange")
         async def on_receiver_state_changed():
