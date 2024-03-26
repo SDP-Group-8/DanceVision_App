@@ -6,10 +6,21 @@ import useUserVideo from "../../hooks/useUserVideo";
 import UserVideoAndTotalScore from "../../components/UserVideoAndTotalScore/UserVideoAndTotalScore";
 import AvgScores from "../../components/AvgScores/AvgScores";
 import DetailedGraphs from "../../components/DetailedGraphs/DetailedGraphs";
+import useDbDetailedScore from "../../hooks/useDbDetailedScore";
+import { getUserInfo } from "../../utils/localstorage";
+import { useLocation } from "react-router-dom";
 
 const ScoringPage = (basename, datetime) => {
-  const { score, isLoading, error, avgScore } = useDetailedScore(
-    import.meta.env.VITE_API_URL
+  // const { score, isLoading, error, avgScore } = useDetailedScore(
+  //   import.meta.env.VITE_API_URL
+  // );
+  const location = useLocation();
+  const video_id = new URLSearchParams(location.search).get("id");
+  console.log(video_id);
+  const username = getUserInfo()
+
+  const { score, isLoading, error, avgScore } = useDbDetailedScore(
+    import.meta.env.VITE_API_URL, username, video_id
   );
 
   const { videoBlob, videoLoading, videoError } = useUserVideo(

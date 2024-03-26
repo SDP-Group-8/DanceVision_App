@@ -1,19 +1,21 @@
 import useVideoFeed from '../../hooks/useVideoFeed';
 import styles from './DanceScreen.module.css';
-import ScoringPage from '../../pages/ScoringPage/ScoringPage.jsx';
 import TimeLine from '../TimeLine.jsx'
 
-import { useLocation } from 'react-router-dom';
-import React, {useRef, useState} from 'react'
+import { useLocation, useNavigate } from 'react-router-dom';
+import React, {useRef, useEffect, useState} from 'react'
 import CustomStepper from '../CustomStepper.jsx';
-import ScoreBar from '../ScoreBar/ScoreBar.jsx';
 import usePeerConnection from '../../hooks/usePeerConnection.jsx';
 import useReferenceVideo from '../../hooks/useReferenceVideo.jsx';
+import ScoreBar from '../ScoreBar/ScoreBar.jsx'
+import axios from 'axios';
+import { getUserInfo } from '../../utils/localstorage.jsx';
 
 let initial = false
 
 function DanceScreen(props) {
   const { state } = useLocation();
+  const navigate = useNavigate()
 
   const [videoDuration, setVideoDuration] = useState(0);
   const options = {videoName: state.videoName, basename: state.basename}
@@ -22,15 +24,36 @@ function DanceScreen(props) {
   const {liveVideoSource, isConnectionClosed} = useVideoFeed(peerConnection);
   const {recordedVideoSource} = useReferenceVideo(peerConnection)
 
+  const username = getUserInfo()
+
   const liveVideos = useRef(new MediaStream())
   const recordedVideos = useRef(new MediaStream())
 
   liveVideos.current.srcObject = liveVideoSource;
   recordedVideos.current.srcObject = recordedVideoSource;
 
+  
+  useEffect(() => {
+  const fetchId = async () => {
+    try {
+      const params = new URLSearchParams({"username": username})
+      const response = await axios.get(import.meta.env.VITE_API_URL + "/detailed_scores?" + params, { responseType: 'json' });  
+      if(response.data.id){
+        navigate(`/scoring?id=${response.data.id}`)
+      }else{
+        console.log("Error fetch dance Id")
+      }
+      } catch (error) {
+        console.error(error)
+      }
+    };
+    if (isConnectionClosed){
+      fetchId();
+    }
+  }, [isConnectionClosed]);
+
   return (
-    isConnectionClosed ? <ScoringPage basename={state.basename} datetime={recordingDate} /> 
-    : <div className={styles.danceScreen}>
+    <div className={styles.danceScreen}>
       <div className={styles.stepper}>
 
       <CustomStepper stepIndex={1}/>
@@ -54,10 +77,8 @@ function DanceScreen(props) {
         
       </div>
       <div className={styles.gradient}></div>
-      
     </div>
-
-  );
+  )
 }
 
 export default DanceScreen;

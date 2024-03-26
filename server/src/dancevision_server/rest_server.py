@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import logging
@@ -27,6 +28,8 @@ from dancevision_server.keypoint_responders.keypoint_feedback import KeypointFee
 from dancevision_server.keypoint_responders.keypoint_naive import KeypointNaive
 from dancevision_server.score_aggregator import ScoreAggregator
 
+from dancevision_server import mongoServer
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     multiprocessing.set_start_method("spawn", force=True)
@@ -52,6 +55,8 @@ stream_port = None
 
 connection_offers = {}
 connection_answers = {}
+
+current_video_id = ''
 
 logger = logging.Logger("rest_server")
 
@@ -153,20 +158,32 @@ async def get_thumbnails():
     return {"thumbnails": [thumbnail.to_dict() for thumbnail in names]}
 
 @rest_app.get("/detailed_scores")
-async def get_detailed_scores():
+async def get_detailed_scores(username: str):
     """
     Return detailed scores and information about frames compared so far
     :return A list of scores for each Keypoint statistics
     """
     global score_aggregator
+    global current_video_id
 
-    if score_aggregator:
-        results = score_aggregator.get_all_scores()
-        results["avg_score_over_time"] = []
+    detailed_scores = score_aggregator.get_all_scores()
+    avgScores = score_aggregator.get_avg_scores()
+    accuracy_over_time = score_aggregator.calculate_accuracy_over_time()
+    total_score = score_aggregator.get_total_score()
+    detailed_scores["avg_score_over_time"] = accuracy_over_time
+    avgScores['total_score'] = total_score
 
-        return results
-    
-    JSONResponse("", status_code=status.HTTP_409_CONFLICT)
+    results = {
+        'avgScores': avgScores,
+        'detailed_scores' : detailed_scores,
+        "ref_video_name" : "fineese_step",
+        "time_stamp" : "2024-03-20 20:18:34"
+    }
+
+    video_id = mongoServer.store_dance_score(username, results)
+    current_video_id = video_id
+
+    return {"id": current_video_id}
 
 @rest_app.get("/user_video")
 async def get_user_video(video_name: str, attempt_datetime: str):
@@ -175,6 +192,43 @@ async def get_user_video(video_name: str, attempt_datetime: str):
     """
     #FileResponse(path, media_type="video/mp4" )
     return {"name": video_name}
+
+@rest_app.post("/db_detailed_score")
+async def db_detailed_score_endpoint(request : Request):
+    data = await request.json()
+    username = data.get("username")
+    id = data.get("id")
+    return mongoServer.get_dance_score(username, id)
+
+@rest_app.post("/login")
+async def login_endpoint(request : Request):
+    data = await request.json()
+    email = data.get("email")
+    password = data.get("password")
+    return mongoServer.login(email, password)
+
+@rest_app.post("/register")
+async def register_endpoint(request : Request):
+    data = await request.json()
+    email = data.get("email")
+    password = data.get("password")
+    name = data.get("name")
+    userName = data.get("username")
+    if mongoServer.email_exists(email):
+        return {'status': 'failure', 'reason': 'Email already in use'}
+    elif mongoServer.user_name_exists(userName):
+        return { 'status': 'failure', 'reason': 'Username already exists' }
+    else:
+        result, login_id = mongoServer.register(email, password)
+        mongoServer.add_personal_information(userName, login_id, name, email )
+        return result
+
+@rest_app.post("/personal_details")
+async def personal_details_endpoint(request : Request):
+    data = await request.json()
+    result = mongoServer.get_personal_information(data.get("username"))
+    return  result
+    
     
 
 @rest_app.post("/offer")

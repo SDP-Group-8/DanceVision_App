@@ -7,6 +7,5 @@ class ScoreChannel:
         self.data_channel = data_channel
 
     def send_score_message(self, score: float):
-        print("sending", score)
         if self.data_channel is not None and self.data_channel.readyState == "open":
             self.data_channel.send(str(score))
