@@ -1,21 +1,46 @@
-import React from "react";
+import React, { useState } from "react";
 import { CountdownDonut } from "../../components/CountdownDonut";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Spinner } from '@chakra-ui/react'
+import { useLocation } from "react-router-dom";
+import useStatusChannel from "../../hooks/useStatusChannel";
+import DanceScreen from "../../components/DanceScreen/DanceScreen";
+import usePeerReceiver from "../../hooks/usePeerReceiver";
+
+let initial = false
 
 const CountdownPage = () => {
     const countdown = 5;
-    const navigate = useNavigate()
+    const [ started, setStarted ] = useState(false)
     const { state } = useLocation();
 
-    React.useEffect(() => {
-        const timeout = setTimeout(() => {
-            navigate("/live_comparison", {state: state})
-        }, countdown * 1000)
+    const { statusChannel } = usePeerReceiver(import.meta.env.VITE_API_URL, !initial, {videoName: state.videoName})
+    initial = true
     
-        return () => clearTimeout(timeout)
-    })
+    const { isInFrame } = useStatusChannel(statusChannel)
 
-    return <CountdownDonut initialSeconds={countdown}/>;
+    React.useEffect(() => {
+        let timeout = undefined
+        
+        if(isInFrame){
+            timeout = setTimeout(() => {
+                setStarted(true)
+            }, countdown * 1000)
+        }
+
+        return () => {
+            if(timeout !== undefined){
+                clearTimeout(timeout)
+            }   
+        }
+    }, [isInFrame])
+
+    if(started){
+        return <DanceScreen/>
+    }else if(isInFrame){
+        return <CountdownDonut initialSeconds={countdown}/>
+    }
+
+    return <Spinner/>
 }
 
 export default CountdownPage;

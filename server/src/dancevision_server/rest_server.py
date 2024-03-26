@@ -1,38 +1,38 @@
 from __future__ import annotations
 
-from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import os
 import uvicorn
 import logging
-import asyncio
-from pathlib import Path
 
+from contextlib import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, File, UploadFile, status
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import JSONResponse
+import signal
 
 import argparse
 import logging
+import multiprocessing
 
-from pose_estimation.scoring.euclidean_score import EuclideanScore
+from dancevision_startup.launch_video_streamer import launch_video_streamer, launch_chromium
 
+from dancevision_server.mux.local_mux import LocalMux
+from dancevision_server.mux.stream_mux import StreamMux
 from dancevision_server.session_description import SessionDescription
 from dancevision_server.video_saver import VideoSaver
-from dancevision_server.stream_comparison import StreamComparison
-from dancevision_server.environment import model_var_name
 from dancevision_server.thumbnail_info import ThumbnailInfo
-from dancevision_server.stream_sender import StreamSender
-from dancevision_server.host_identifiers import SERVER_IDENTIFIER, RASPBERRY_PI_IDENTIFIER
-from dancevision_server.video_loader import VideoLoader
-from dancevision_server.recorder import Recorder
-from dancevision_server.score_estimator import ScoreEstimator
-from dancevision_server.score_channel import ScoreChannel
+from dancevision_server.video_starter import VideoStarter
+from dancevision_server.dual_video_starter import DualVideoStarter
+from dancevision_server.keypoint_responders.keypoint_feedback import KeypointFeedback
+from dancevision_server.keypoint_responders.keypoint_naive import KeypointNaive
 from dancevision_server.score_aggregator import ScoreAggregator
 
-from dancevision_startup.launch_video_streamer import launch_video_streamer
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    multiprocessing.set_start_method("spawn", force=True)
+    yield
 
-rest_app = FastAPI()
+rest_app = FastAPI(debug=True, lifespan=lifespan)
 logger = logging.getLogger("dancevision_server.rest_server")
 
 address = None
@@ -40,7 +40,7 @@ port = None
 
 file = None
 
-comparison = None
+video_starter = None
 score_aggregator = None
 planner = None
 
@@ -82,102 +82,64 @@ async def upload_video(video: UploadFile = File(...)):
     return {"message": "File uploaded successfully"} 
 
 @rest_app.get("/start-video")
-async def start_video(video_name: str, basename: str):
-    global address
-    global port
-    global file
-    global comparison
-    global score_aggregator
-    global planner
-    global no_ros
+async def start_video():
     global stream_address
     global stream_port
+
+    global file
+    global video_starter
+    global planner
+    global no_ros
     
     """
     Start the main comparison screen with the selected video
     :param video_name: name of the video file
     """
-    filepath = VideoSaver.get_video_filepath(video_name)
+    mux = StreamMux() if file is None else LocalMux()
+    keypoint_feedback = KeypointNaive() if no_ros else KeypointFeedback(planner)
+    video_starter = VideoStarter(stream_address, stream_port, mux, keypoint_feedback, file, connection_offers, connection_answers)
+    await video_starter.start()
+    return {"message": "Live Video Started"} 
 
-    video_loader = VideoLoader(Path(video_name))
-    keypoints = video_loader.load_keypoints()
-    if keypoints:
-        score_estimator = ScoreEstimator(keypoints, EuclideanScore())
+@rest_app.get("/open-window")
+def open_window():
+    global stream_address
+    global stream_port
+    
+    if stream_address is not None:
+        launch_chromium(stream_address, stream_port, True)
 
-    def read_lines(stdin, stdout, stderr):
-        stdout.readlines()
+@rest_app.get("/start-streamer")
+def start_streamer():
+    global stream_address
+    global stream_port
 
     if stream_address is not None:
-        p1, p2 = launch_video_streamer(stream_address, stream_port, read_lines)
+        launch_video_streamer(stream_address, stream_port)
 
-    model_path = os.environ[model_var_name]
+@rest_app.get("/start-reference")
+async def start_reference(video_name: str, basename: str):
+    global stream_address
+    global stream_port
+    global video_starter
+    global score_aggregator
 
     score_aggregator = ScoreAggregator()
 
-    def callback(score_channel: ScoreChannel, pose_detections):
-        if score_estimator and score_channel:
-            score, component_scores = score_estimator.find_score(0, pose_detections)
-            score_channel.send_score_message(score)
-            score_aggregator.add_scores(component_scores)
+    mux = StreamMux() if file is None else LocalMux()
+    video_starter = DualVideoStarter(stream_address, stream_port, mux, file, connection_offers, connection_answers)
 
-    while SERVER_IDENTIFIER not in connection_offers:
-        await asyncio.sleep(2)
+    recording_time = await video_starter.start(video_name, basename, score_aggregator)
+    return JSONResponse({"datetime": recording_time.isoformat()})
 
-    offer = connection_offers[SERVER_IDENTIFIER]
+@rest_app.delete("/clear-connection")
+async def clear_connection():
+    global video_starter
 
-    recorder = Recorder()
-    recorder.initialize(basename)
+    if video_starter is not None:
+        await video_starter.close()
 
-    args = {
-        "parameter_path": model_path,
-        "recorder": recorder,
-        "on_pose_detections": callback,
-        "planner": planner
-    }
-
-    comparison = None # No clue why this is needed
-
-    def on_sender_connection_closed():            
-        if SERVER_IDENTIFIER in connection_offers:
-            del connection_offers[SERVER_IDENTIFIER]
-
-        if SERVER_IDENTIFIER in connection_answers:
-            del connection_answers[SERVER_IDENTIFIER]
-
-    if file is not None:
-        args["file"] = file
-        comparison = StreamSender(on_connection_closed=on_sender_connection_closed, **args)
-
-        answer = await comparison.run(offer)
-        comparison.add_second_track(file=str(filepath))
-        connection_answers[SERVER_IDENTIFIER] = answer
-    else:
-        def on_connection_closed():
-            on_sender_connection_closed()
-            
-            if RASPBERRY_PI_IDENTIFIER in connection_offers:
-                del connection_offers[RASPBERRY_PI_IDENTIFIER]
-
-            if RASPBERRY_PI_IDENTIFIER in connection_answers:
-                del connection_answers[RASPBERRY_PI_IDENTIFIER]
-
-            p1.kill()
-            p2.kill()
-
-        args["file"] = str(filepath)
-        comparison = StreamComparison(address, port, on_connection_closed=on_connection_closed, **args)
-        answer = await comparison.negotiate_sender(offer)
-        connection_answers[SERVER_IDENTIFIER] = answer
-
-        async def set_offer_and_get_answer(local_offer):
-            connection_offers[RASPBERRY_PI_IDENTIFIER] = local_offer
-            while RASPBERRY_PI_IDENTIFIER not in connection_answers:
-                await asyncio.sleep(2)
-            return connection_answers[RASPBERRY_PI_IDENTIFIER]
-
-        await comparison.negotiate_receiver(set_offer_and_get_answer)
-
-    return JSONResponse({"datetime": recorder.get_recording_datetime().isoformat()})
+    return {"message": "Success"}
 
 # Retrieve thumbnail icons.
 @rest_app.get("/thumbnails")
@@ -303,13 +265,46 @@ def run_app(app_address, app_port, app_no_ros=True, app_stream_address=None, app
 
     if not no_ros:
         from robot_controller.robot_controller_node import RobotControllerNode
-        from dancevision_server.planners.basic_planner import BasicPlanner as Planner
+        from dancevision_server.planners.fixed_planner import FixedPlanner as Planner
         robot_controller = RobotControllerNode()
         planner = Planner()
 
     thumbnails_dir = VideoSaver.get_video_directory()
     rest_app.mount("/thumbnails", StaticFiles(directory=thumbnails_dir / "thumbnails"))
-    uvicorn.run(rest_app, host=app_address, port=int(app_port))
+    uvicorn.run(rest_app, host=app_address, port=int(app_port), log_config=LOGGING_CONFIG)
+
+LOGGING_CONFIG = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "default": {
+            "()": "uvicorn.logging.DefaultFormatter",
+            "fmt": "%(levelprefix)s %(message)s",
+            "use_colors": None,
+        },
+        "access": {
+            "()": "uvicorn.logging.AccessFormatter",
+            "fmt": '%(levelprefix)s %(client_addr)s - "%(request_line)s" %(status_code)s',  # noqa: E501
+        },
+    },
+    "handlers": {
+        "default": {
+            "formatter": "default",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stderr",
+        },
+        "access": {
+            "formatter": "access",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stdout",
+        },
+    },
+    "loggers": {
+        "uvicorn": {"handlers": ["default"], "level": "TRACE", "propagate": False},
+        "uvicorn.error": {"level": "TRACE"},
+        "uvicorn.access": {"handlers": ["access"], "level": "TRACE", "propagate": False},
+    },
+}
 
 def main():
     parser = argparse.ArgumentParser()

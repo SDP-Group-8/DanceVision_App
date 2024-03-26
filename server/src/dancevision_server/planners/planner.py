@@ -2,9 +2,7 @@ from __future__ import annotations
 
 from pose_estimation.keypoint_statistics import KeypointStatistics
 
-
 from abc import ABC, abstractmethod
-
 
 class Planner(ABC):
     @abstractmethod

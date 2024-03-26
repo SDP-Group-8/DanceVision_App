@@ -9,14 +9,19 @@ import React, {useRef, useState} from 'react'
 import CustomStepper from '../CustomStepper.jsx';
 import ScoreBar from '../ScoreBar/ScoreBar.jsx';
 import usePeerConnection from '../../hooks/usePeerConnection.jsx';
+import useReferenceVideo from '../../hooks/useReferenceVideo.jsx';
+
+let initial = false
 
 function DanceScreen(props) {
   const { state } = useLocation();
 
   const [videoDuration, setVideoDuration] = useState(0);
-  const options = {basename: state.basename, videoName: state.videoName}
-  const {peerConnection, recordingDate} = usePeerConnection(import.meta.env.VITE_API_URL, true, options)
-  const {liveVideoSource, recordedVideoSource, isConnectionClosed} = useVideoFeed(peerConnection);
+  const options = {videoName: state.videoName, basename: state.basename}
+  let {peerConnection, recordingDate, scoreChannel} = usePeerConnection(import.meta.env.VITE_API_URL, !initial, options)
+  initial = true
+  const {liveVideoSource, isConnectionClosed} = useVideoFeed(peerConnection);
+  const {recordedVideoSource} = useReferenceVideo(peerConnection, {basename: state.basename})
 
   const liveVideos = useRef(new MediaStream())
   const recordedVideos = useRef(new MediaStream())
@@ -42,7 +47,7 @@ function DanceScreen(props) {
         <div className={styles.refVideo}>
           <video ref={recordedVideos} autoPlay width="100%" ></video>
         </div>
-        <ScoreBar></ScoreBar>
+        <ScoreBar scoreChannel={scoreChannel}></ScoreBar>
       
       </div>
       <div className={styles.timeline}>

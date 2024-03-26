@@ -6,6 +6,7 @@ const useScoreChannel = (scoreChannel) => {
     useEffect(() => {
         if (scoreChannel !== undefined){
             scoreChannel.onmessage = (event) => {
+                console.log(event)
                 setLatestScore(event.data)
             };
         }

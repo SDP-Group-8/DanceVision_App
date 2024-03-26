@@ -3,7 +3,6 @@ import { useState, useEffect} from 'react';
 
 const useVideoFeed = (peerConnection, options = {}) => {
     const [liveVideoSource, setLiveVideoSource] = useState(new MediaStream());
-    const [recordedVideoSource, setRecordedVideoSource] = useState(new MediaStream());
     const [isVideoAvailable, setVideoAvailable] = useState(false);
     const [isConnectionClosed, setConnectionClosed] = useState(false);
     
@@ -21,8 +20,6 @@ const useVideoFeed = (peerConnection, options = {}) => {
             if (evt.track.kind == 'video') {
                 if(evt.transceiver.mid === "0"){
                     setLiveVideoSource(new MediaStream([evt.track]));
-                }else if(evt.transceiver.mid === "1"){
-                    setRecordedVideoSource(new MediaStream([evt.track]));
                 }
     
                 setVideoAvailable(true);                    
@@ -30,7 +27,7 @@ const useVideoFeed = (peerConnection, options = {}) => {
         });
     }
 
-    return {liveVideoSource, recordedVideoSource, isVideoAvailable, isConnectionClosed}
+    return {liveVideoSource, isVideoAvailable, isConnectionClosed}
 }
 
 export default useVideoFeed;
