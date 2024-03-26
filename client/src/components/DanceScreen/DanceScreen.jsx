@@ -4,6 +4,9 @@ import ScoringPage from '../../pages/ScoringPage/ScoringPage.jsx';
 import LiveScore from '../LiveScore/LiveScore';
 import TimeLine from '../TimeLine.jsx'
 
+import liveVid from '../../assets/sample1.mp4';
+import refVid from '../../assets/sample3.mp4';
+
 import { useLocation } from 'react-router-dom';
 import React, {useRef, useState} from 'react'
 import CustomStepper from '../CustomStepper.jsx';
@@ -34,13 +37,13 @@ function DanceScreen(props) {
       <div className={styles.videoContainer}>
         <div className={styles.leftPanel}>
           <div className={styles.liveVideo}>
-            <video ref={liveVideos} autoPlay width="100%"></video>
+            <video src={liveVid} autoPlay width="100%"></video>
           </div>
           
         </div>
 
         <div className={styles.refVideo}>
-          <video ref={recordedVideos} autoPlay width="100%" ></video>
+          <video src={refVid} autoPlay width="100%" ></video>
         </div>
         <ScoreBar></ScoreBar>
       

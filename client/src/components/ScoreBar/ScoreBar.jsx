@@ -11,7 +11,7 @@ const ScoreBar = () => {
     return (
         <div className={styles.rightPanel}>
             <h1>Your Score</h1>  
-            <LiveScore score={latestScore}/>    
+            <LiveScore score={100}/>    
         </div>
     )
 }

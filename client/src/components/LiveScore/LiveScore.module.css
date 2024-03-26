@@ -51,3 +51,43 @@
 .score_yellow {
   color: #faf089;
 }
+
+@media (max-width: 550px) {
+  .liveScore {
+    position: absolute;
+    width: 100vw;
+    top: 0;
+    left: 0;
+    height: 1rem;
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+
+  .liveScore > h1 {
+    position: absolute;
+    top: 0.5rem;
+    left: 45%;
+  }
+
+  .bar_container {
+    width: calc(100% - 4.5rem);
+    height: 100%;
+  }
+
+  .blur {
+    width: 100vw;
+    height: 20rem;
+    top: 0;
+    left: 0;
+  }
+
+  .bar {
+    display: none;
+  }
+
+  .score_green,
+  .score_yellow,
+  .score_red {
+    font-size: var(--small);
+  }
+}

@@ -1,6 +1,11 @@
-
 .rightPanel {
-    width: 20vw;
-    height: 100%;
-    z-index: 1;
+  width: 20vw;
+  height: 100%;
+  z-index: 1;
+}
+
+@media (max-width: 550px) {
+  .rightPanel > h1 {
+    display: none;
   }
+}
