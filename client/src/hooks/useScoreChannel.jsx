@@ -12,7 +12,7 @@ const useScoreChannel = (scoreChannel) => {
         }
     }, [scoreChannel])
 
-    return {latestScore}
+    return {latestScore: Number(latestScore)}
 }
 
 export default useScoreChannel;
