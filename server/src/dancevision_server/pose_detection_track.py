@@ -1,25 +1,27 @@
 from __future__ import annotations
 
-from typing import Callable
-
 from aiortc import MediaStreamTrack
 from av import VideoFrame
 
+from dancevision_server.keypoint_responders.keypoint_feedback import KeypointFeedback
+
 from pose_estimation.mediapipe import MediaPipe
 from pose_estimation.single_window import SingleWindow
-# from pose_estimation.score_data import ScoreData
 
 class PoseDetectionTrack(MediaStreamTrack):
     kind = "video"
 
-    def __init__(self, track, mediapipe: MediaPipe, on_pose_detections: Callable | None = None):
+    def __init__(self, track, mediapipe: MediaPipe, on_pose_detections: KeypointFeedback):
         super().__init__()  # don't forget this!
         self.track = track
         self.mediapipe = mediapipe
-        self.on_pose_detections = on_pose_detections
+        self.keypoint_feedback = on_pose_detections
+        self.single_window = None
 
-    def update_pose_callack(self, on_pose_detections: Callable):
-        self.on_pose_detections = on_pose_detections
+    def show_window(self, img):
+        if self.single_window is None:
+            self.single_window = SingleWindow(array=img)
+        self.single_window.show_image(img)
 
     async def recv(self):
         frame = await self.track.recv()
@@ -29,8 +31,8 @@ class PoseDetectionTrack(MediaStreamTrack):
         res = self.mediapipe.process_frame(img, int(frame.time * 1e3))
         if res:
             img = SingleWindow.draw_pose_on_image(img, res.to_normalized_landmarks())
-            if self.on_pose_detections:
-                self.on_pose_detections(res)
+            self.keypoint_feedback.keypoint_callback(res)
+        self.show_window(img)
 
         # rebuild a VideoFrame, preserving timing information
         new_frame = VideoFrame.from_ndarray(img, format="bgr24")

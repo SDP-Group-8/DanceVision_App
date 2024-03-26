@@ -1,5 +1,6 @@
 import React from "react";
 import useDetailedScore from "../../hooks/useDetailedScore";
+import CustomStepper from "../../components/CustomStepper";
 import styles from "./ScoringPage.module.css";
 import useUserVideo from "../../hooks/useUserVideo";
 import UserVideoAndTotalScore from "../../components/UserVideoAndTotalScore/UserVideoAndTotalScore";

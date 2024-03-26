@@ -1,6 +1,7 @@
 import useFetchImages from "../../hooks/useFetchImages";
 import styles from "./SelectVideoPage.module.css";
-import { Spinner } from '@chakra-ui/react'
+import { Spinner } from '@chakra-ui/react';
+import CustomStepper from "../../components/CustomStepper";
 
 import VideoDisplay from "../../components/VideoDisplay/VideoDisplay";
 
@@ -28,8 +29,8 @@ function SelectVideoPage() {
 
     return (
       <div className={styles.SelectVideoPage}>
-        
-        <h1 className={styles.header}>Select A Dance Video</h1>
+        <div className={styles.stepper}><CustomStepper stepIndex={0}/></div>
+    
         <div className={styles["thumbnail-container"]}>
           {images.map((image) => 
             <VideoDisplay 
