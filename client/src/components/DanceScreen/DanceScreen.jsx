@@ -9,13 +9,13 @@ import usePeerConnection from '../../hooks/usePeerConnection.jsx';
 import useReferenceVideo from '../../hooks/useReferenceVideo.jsx';
 import ScoreBar from '../ScoreBar/ScoreBar.jsx'
 import axios from 'axios';
+import { getUserInfo } from '../../utils/localstorage.jsx';
 
 let initial = false
 
 function DanceScreen(props) {
   const { state } = useLocation();
   const navigate = useNavigate()
-  const [id, setId] = useState();
 
   const [videoDuration, setVideoDuration] = useState(0);
   const options = {videoName: state.videoName, basename: state.basename}
@@ -23,6 +23,8 @@ function DanceScreen(props) {
   initial = true
   const {liveVideoSource, isConnectionClosed} = useVideoFeed(peerConnection);
   const {recordedVideoSource} = useReferenceVideo(peerConnection)
+
+  const username = getUserInfo()
 
   const liveVideos = useRef(new MediaStream())
   const recordedVideos = useRef(new MediaStream())
@@ -34,10 +36,10 @@ function DanceScreen(props) {
   useEffect(() => {
   const fetchId = async () => {
     try {
-      const response = await axios.get(import.meta.env.VITE_API_URL + "/detailed_scores", { responseType: 'json' });  
-      setId(response.data.id)
-      if(id){
-        navigate(`/scoring?id=${id}`)
+      const params = new URLSearchParams({"username": username})
+      const response = await axios.get(import.meta.env.VITE_API_URL + "/detailed_scores?" + params, { responseType: 'json' });  
+      if(response.data.id){
+        navigate(`/scoring?id=${response.data.id}`)
       }else{
         console.log("Error fetch dance Id")
       }

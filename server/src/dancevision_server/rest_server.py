@@ -158,7 +158,7 @@ async def get_thumbnails():
     return {"thumbnails": [thumbnail.to_dict() for thumbnail in names]}
 
 @rest_app.get("/detailed_scores")
-async def get_detailed_scores():
+async def get_detailed_scores(username: str):
     """
     Return detailed scores and information about frames compared so far
     :return A list of scores for each Keypoint statistics
@@ -180,7 +180,7 @@ async def get_detailed_scores():
         "time_stamp" : "2024-03-20 20:18:34"
     }
 
-    video_id = mongoServer.store_dance_score(results)
+    video_id = mongoServer.store_dance_score(username, results)
     current_video_id = video_id
 
     return {"id": current_video_id}
@@ -196,7 +196,6 @@ async def get_user_video(video_name: str, attempt_datetime: str):
 @rest_app.post("/db_detailed_score")
 async def db_detailed_score_endpoint(request : Request):
     data = await request.json()
-    print(data)
     username = data.get("username")
     id = data.get("id")
     return mongoServer.get_dance_score(username, id)
@@ -204,7 +203,6 @@ async def db_detailed_score_endpoint(request : Request):
 @rest_app.post("/login")
 async def login_endpoint(request : Request):
     data = await request.json()
-    print(data)
     email = data.get("email")
     password = data.get("password")
     return mongoServer.login(email, password)
@@ -212,7 +210,6 @@ async def login_endpoint(request : Request):
 @rest_app.post("/register")
 async def register_endpoint(request : Request):
     data = await request.json()
-    print(data)
     email = data.get("email")
     password = data.get("password")
     name = data.get("name")
