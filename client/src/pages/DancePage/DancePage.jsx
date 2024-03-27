@@ -1,4 +1,3 @@
-
 const DancePage = () => {
 
     React.useEffect(() => {

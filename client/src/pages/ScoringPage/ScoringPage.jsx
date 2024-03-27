@@ -6,11 +6,16 @@ import useUserVideo from "../../hooks/useUserVideo";
 import UserVideoAndTotalScore from "../../components/UserVideoAndTotalScore/UserVideoAndTotalScore";
 import AvgScores from "../../components/AvgScores/AvgScores";
 import DetailedGraphs from "../../components/DetailedGraphs/DetailedGraphs";
+import { useNavigate } from "react-router-dom";
+
 
 const ScoringPage = (basename, datetime) => {
   const { score, isLoading, error, avgScore } = useDetailedScore(
     import.meta.env.VITE_API_URL
   );
+
+  const navigate = useNavigate();
+
 
   const { videoBlob, videoLoading, videoError } = useUserVideo(
     import.meta.env.VITE_API_URL, basename, datetime
@@ -24,13 +29,12 @@ const ScoringPage = (basename, datetime) => {
     return (
       <div
         className={styles.container}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: "0px",
-        }}
+
       >
+        <div className={styles.stepper}>
+          <CustomStepper stepIndex={2} color="black" />
+        </div>
+        
         {videoBlob && (
           <UserVideoAndTotalScore
             videoBlob={videoBlob}
@@ -39,6 +43,7 @@ const ScoringPage = (basename, datetime) => {
         )}
         {avgScore && <AvgScores avgScore={avgScore}></AvgScores>}
         {score && <DetailedGraphs score={score}></DetailedGraphs>}
+        <button className={styles.button} onClick={() => navigate('/home')}>Exit</button>
       </div>
     );
   }

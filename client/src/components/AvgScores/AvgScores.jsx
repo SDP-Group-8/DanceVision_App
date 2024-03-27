@@ -219,12 +219,16 @@ const AvgScores = (AvgScore) => {
         </div>
         <div className={styles.right}>
           {/* <h1 className={styles.graph_heading}>Accuracy over time</h1> */}
-          <Line
-            options={chartOptions()}
-            data={generateChartData(AvgScore.avgScore[0].avg_score_over_time)}
-            className={styles.line_chart}
-          />
           <h2 className={styles.graph_heading}>Overall Accuracy over time</h2>
+          <div className={styles.line_chart_container}>
+            <Line
+              options={chartOptions()}
+              data={generateChartData(AvgScore.avgScore[0].avg_score_over_time)}
+              className={styles.line_chart}
+            />
+          </div>
+          
+          
         </div>
       </div>
     </div>
