@@ -60,16 +60,6 @@ function chartOptions() {
     },
   };
 }
-const data = {
-  datasets: [
-    {
-      data: [60, 40],
-      backgroundColor: ["rgb(0, 197, 0)", "rgb(204, 223, 243)"],
-      borderWidth: 2,
-      radius: "40%",
-    },
-  ],
-};
 
 const roundNumber = (number) => {
   return (100 * number).toFixed(2)
