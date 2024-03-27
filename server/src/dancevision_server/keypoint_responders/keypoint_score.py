@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pose_estimation.scoring.score_normalizer import ScoreNormalizer
+
 from dancevision_server.score_channel import ScoreChannel
 from dancevision_server.movement_channel import MovementChannel
 from dancevision_server.score_aggregator import ScoreAggregator
@@ -23,5 +25,8 @@ class KeypointScore(KeypointResponder):
     def keypoint_callback(self, pose_detections):
         if self.score_estimator and self.score_aggregator and self.score_channel:
             score, component_scores = self.score_estimator.find_score(0, pose_detections)
+            score = ScoreNormalizer.convert(score, 2, 2)
+            for name, value in component_scores.items():
+                component_scores[name] = ScoreNormalizer.convert(value, 2, 2)
             self.score_channel.send_score_message(score)
             self.score_aggregator.add_scores(component_scores)

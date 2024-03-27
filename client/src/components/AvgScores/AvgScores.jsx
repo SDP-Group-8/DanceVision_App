@@ -50,19 +50,6 @@ const options = {
   maintainAspectRatio: true,
 };
 
-function generateDoughnutData(numbers) {
-  return {
-    datasets: [
-      {
-        data: numbers,
-        backgroundColor: ["rgb(0, 197, 0)", "rgb(204, 223, 243)"],
-        borderWidth: 2,
-        radius: "40%",
-      },
-    ],
-  };
-}
-
 function generateChartData(numbers) {
   return {
     labels: ["0", "5", "10", "15", "20"],
@@ -70,7 +57,7 @@ function generateChartData(numbers) {
       {
         fill: true,
         label: "Score",
-        data: numbers,
+        data: numbers.map(num => 100 * num),
         borderColor: "rgb(54, 162, 235)",
         backgroundColor: "rgba(54, 162, 235, 0.5)",
       },
@@ -108,7 +95,7 @@ const data = {
 };
 
 const roundNumber = (number) => {
-  return number.toFixed(2)
+  return (100 * number).toFixed(2)
 }
 
 const AvgScores = (AvgScore) => {
