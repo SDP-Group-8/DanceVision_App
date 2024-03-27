@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { establishConnection } from '../peerConnection';
+import { getUserInfo } from '../utils/localstorage';
 
 let reloaded = false
 
@@ -13,6 +14,8 @@ const usePeerConnection = (url, negotiate = false, options = {}) => {
         sdpSemantics: 'unified-plan'
     };
 
+    const info = getUserInfo()
+
     useEffect(() => {
         const getVideoStream = async () => {
             const pc =new RTCPeerConnection(config)
@@ -23,7 +26,7 @@ const usePeerConnection = (url, negotiate = false, options = {}) => {
             const scoreChannel = pc.createDataChannel("score")
             setScoreChannel(scoreChannel)
 
-            const params = new URLSearchParams({"video_name": options.videoName, "basename": options.basename})
+            const params = new URLSearchParams({"video_name": options.videoName, "user_id": info})
 
             if(!reloaded){
                 await axios.delete(import.meta.env.VITE_API_URL + "/clear-connection")

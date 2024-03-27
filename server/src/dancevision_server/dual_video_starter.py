@@ -33,11 +33,11 @@ class DualVideoStarter:
             score_estimator = ScoreEstimator(keypoints, Score())
             return score_estimator
 
-    async def start(self, video_name: str, basename: str, score_aggregator: ScoreAggregator):
+    async def start(self, video_name: str, score_aggregator: ScoreAggregator, user_id: str):
         score_estimator = self.__load_score_estimator(video_name)
 
         recorder = Recorder()
-        recorder.initialize(basename)
+        recorder.initialize(user_id)
 
         offer = await VideoStarter.get_offer(self.connection_offers)
 
