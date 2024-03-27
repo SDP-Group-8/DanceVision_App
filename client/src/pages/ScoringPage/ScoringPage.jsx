@@ -10,6 +10,7 @@ import useDbDetailedScore from "../../hooks/useDbDetailedScore";
 import { getUserInfo } from "../../utils/localstorage";
 import { useLocation } from "react-router-dom";
 
+
 const ScoringPage = (basename, datetime) => {
   // const { score, isLoading, error, avgScore } = useDetailedScore(
   //   import.meta.env.VITE_API_URL
@@ -23,6 +24,9 @@ const ScoringPage = (basename, datetime) => {
     import.meta.env.VITE_API_URL, username, video_id
   );
 
+  
+
+
   const { videoBlob, videoLoading, videoError } = useUserVideo(
     import.meta.env.VITE_API_URL, basename, datetime
   );
@@ -35,13 +39,12 @@ const ScoringPage = (basename, datetime) => {
     return (
       <div
         className={styles.container}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: "0px",
-        }}
+
       >
+        <div className={styles.stepper}>
+          <CustomStepper stepIndex={2} color="black" />
+        </div>
+        
         {videoBlob && (
           <UserVideoAndTotalScore
             videoBlob={videoBlob}
@@ -50,6 +53,7 @@ const ScoringPage = (basename, datetime) => {
         )}
         {avgScore && <AvgScores avgScore={avgScore}></AvgScores>}
         {score && <DetailedGraphs score={score}></DetailedGraphs>}
+        
       </div>
     );
   }

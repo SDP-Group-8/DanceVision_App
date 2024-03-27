@@ -1,18 +1,7 @@
-.scoringPage {
+.container {
   display: flex;
-  padding: 1rem 2rem;
   flex-direction: column;
-  background-image: radial-gradient(
-      circle at center,
-      rgba(255, 255, 255, 0.005) 0,
-      rgba(255, 255, 255, 0.005) 1px,
-      transparent 1px
-    ),
-    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 100px 100px;
-  background-attachment: fixed;
-  background-color: #1f1f1f;
+  align-items: center;
 }
 
 .header {
@@ -35,4 +24,9 @@
 .graph_right {
   width: 40vw;
   padding: 0px;
+}
+
+.stepper {
+  width: 100%;
+  padding: 1rem;
 }
