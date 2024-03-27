@@ -11,7 +11,7 @@ import {
   Legend,
   ArcElement,
 } from "chart.js";
-import { Line, Bar, Pie, Doughnut } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 import styles from "./AvgScores.module.css";
 import Progress from "../Progress/Progress";
 
@@ -26,29 +26,6 @@ ChartJS.register(
   Legend,
   ArcElement
 );
-
-const color = "red";
-
-const textCenter = {
-  id: "textCenter",
-  beforeDatasetsDraw(chart) {
-    const { ctx, data } = chart;
-    ctx.save();
-    ctx.font = "bolder 10px sans-serif";
-    ctx.fillStyle = color;
-    ctx.textAlign = "center";
-    ctx.fillText(
-      `Value: ${data.datasets[0].data[0]}`,
-      chart.getDatasetMeta(0).data[0].x,
-      chart.getDatasetMeta(0).data[0].y
-    );
-  },
-};
-
-const options = {
-  responsive: true,
-  maintainAspectRatio: true,
-};
 
 function generateChartData(numbers) {
   return {
