@@ -6,7 +6,6 @@ import useUserVideo from "../../hooks/useUserVideo";
 import UserVideoAndTotalScore from "../../components/UserVideoAndTotalScore/UserVideoAndTotalScore";
 import AvgScores from "../../components/AvgScores/AvgScores";
 import DetailedGraphs from "../../components/DetailedGraphs/DetailedGraphs";
-import { useNavigate } from "react-router-dom";
 
 
 const ScoringPage = (basename, datetime) => {
