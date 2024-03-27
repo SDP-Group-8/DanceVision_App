@@ -30,12 +30,3 @@
   width: 100%;
   padding: 1rem;
 }
-
-.button {
-  margin: 1rem;
-  max-width: 25rem;
-  min-width: 15rem;
-  padding: 0.5rem;
-  color: white;
-  background-color: var(--pink);
-}

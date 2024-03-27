@@ -16,6 +16,7 @@ import styles from "./DetailedGraphs.module.css";
 import useUserVideo from "../../hooks/useUserVideo";
 import UserVideoAndTotalScore from "../../components/UserVideoAndTotalScore/UserVideoAndTotalScore";
 import AvgScores from "../../components/AvgScores/AvgScores";
+import { useNavigate } from "react-router-dom";
 
 ChartJS.register(
   CategoryScale,
@@ -114,7 +115,7 @@ const DetailedGraphs = (score) => {
       ],
     };
   }
-
+  const navigate = useNavigate();
 
   return (
     <div
@@ -232,6 +233,7 @@ const DetailedGraphs = (score) => {
           />
         </div>
       </div>
+      <button className={styles.button} onClick={() => navigate('/home')}>Exit</button>
     </div>
   );
 };

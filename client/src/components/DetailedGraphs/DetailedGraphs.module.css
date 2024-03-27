@@ -57,6 +57,16 @@
   border-radius: 5px;
 }
 
+.button {
+  margin: 1rem;
+  max-width: 25rem;
+  min-width: 15rem;
+  padding: 0.5rem;
+  color: white;
+  background: transparent;
+  border: 2px solid white;
+}
+
 @media (max-width: 550px) {
   .main_heading {
     font-size: var(--medium-font);

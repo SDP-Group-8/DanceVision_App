@@ -14,7 +14,7 @@ const ScoringPage = (basename, datetime) => {
     import.meta.env.VITE_API_URL
   );
 
-  const navigate = useNavigate();
+  
 
 
   const { videoBlob, videoLoading, videoError } = useUserVideo(
@@ -43,7 +43,7 @@ const ScoringPage = (basename, datetime) => {
         )}
         {avgScore && <AvgScores avgScore={avgScore}></AvgScores>}
         {score && <DetailedGraphs score={score}></DetailedGraphs>}
-        <button className={styles.button} onClick={() => navigate('/home')}>Exit</button>
+        
       </div>
     );
   }
