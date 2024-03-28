@@ -1,0 +1,46 @@
+@property --rotate {
+    syntax: "<angle>";
+    initial-value: 45deg;
+    inherits: false;
+}
+
+@keyframes rotation {
+    0% {
+        --rotate: 0deg;
+    }
+
+    100% {
+        --rotate: 360deg;
+    }
+}
+
+.body {
+    background: linear-gradient(var(--rotate), #db11fb, #2d4af3);
+    animation: rotation 15s linear infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    width: 70%;
+    /* background-color: rgb(26, 1, 43); */
+    background-color: rgb(214, 209, 209);
+    min-height: 80vh;
+    margin-top: 8rem;
+    margin-bottom: 3rem;
+    border-radius: 15px;
+    
+}
+
+.upper{
+    display: flex;
+}
+
+.lower{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 2rem 0rem;
+}

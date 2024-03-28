@@ -132,3 +132,7 @@ dist
 .DS_Store
 server/src/dancevision_server.egg-info/
 server/src/dancevision_server/__pycache__/
+server/src/dancevision_server/planners/__pycache__/
+server/src/dancevision_server/mux/__pycache__/
+server/src/dancevision_server/connectors/__pycache__/
+server/src/dancevision_server/keypoint_responders/__pycache__/
