@@ -1,28 +1,28 @@
 import React from 'react'
 import styles from './LeaderBoardCard.module.css'
 
-const LeaderBoardCard = () => {
+const LeaderBoardCard = ({rank, name, username, score, attempt_time}) => {
   return (
     <div className={`${styles.body} ${styles.fancy}`}>
         <div className={styles.rankContainer}>
-        <p className={`${styles.text} ${styles.rank}`}>Rank : 1</p>
+        <p className={`${styles.text} ${styles.rank}`}>Rank : {rank}</p>
         </div>
         <div className={styles.upper}>
             <div className={styles.upper}>
-                <p className={`${styles.text} ${styles.name}`}>Abhay Maurya</p>
-                <p className={`${styles.text} ${styles.username}`}>@abhay452002</p>
+                <p className={`${styles.text} ${styles.name}`}>{name}</p>
+                <p className={`${styles.text} ${styles.username}`}>@{username}</p>
             </div>
         </div>
         <hr className={styles.line} />
         <div className={styles.lower}>
             <div className={styles.timeContainer}>
                 <p className={`${styles.text}`}>Attempt Time</p>
-                <p className={`${styles.text}`}>27/03/2024 23:22:11 </p>
+                <p className={`${styles.text}`}>{attempt_time}</p>
                 
             </div>
             <div className={styles.scoreContainer}>
                 <p className={`${styles.text}`}>Score</p>
-                <p className={`${styles.text}`}>95%</p>
+                <p className={`${styles.text}`}>{score}%</p>
             </div>
         </div>
     </div>

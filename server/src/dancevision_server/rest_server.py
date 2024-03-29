@@ -234,6 +234,11 @@ async def user_all_dance_score_endpoint(username: str):
     result = mongoServer.get_all_dance_score(username)
     return result
 
+
+@rest_app.get("/leaderboard")
+async def get_leaderboard_data_endpoint():
+    result = mongoServer.get_leaderboard_data()
+    return result
     
     
 
