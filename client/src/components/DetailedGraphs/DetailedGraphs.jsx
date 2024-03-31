@@ -100,10 +100,6 @@ const DetailedGraphs = (score) => {
   // @TODO: Make this more generic and not hardcoded to specific joints. Fetch the length of the video from server and dynamically render this.
   const labels = ["0", "5", "10", "15", "20"];
 
-  function generateLabels(number){
-    return Array.from({ length: number }, (_, index) => (index + 1).toString());
-  }
-
   function generateChartData(numbers, name) {
     return {
       labels: labels,
@@ -111,7 +107,7 @@ const DetailedGraphs = (score) => {
         {
           fill: true,
           label: "Score",
-          data: numbers,
+          data: numbers.map(num => 100 * num),
           borderColor: colour_map[name].bg,
           backgroundColor: colour_map[name].border,
         },

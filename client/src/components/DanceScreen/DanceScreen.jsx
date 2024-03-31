@@ -7,6 +7,7 @@ import React, {useRef, useEffect, useState} from 'react'
 import CustomStepper from '../CustomStepper.jsx';
 import usePeerConnection from '../../hooks/usePeerConnection.jsx';
 import useReferenceVideo from '../../hooks/useReferenceVideo.jsx';
+import CountdownDonut from '../CountdownDonut/CountdownDonut.jsx';
 import ScoreBar from '../ScoreBar/ScoreBar.jsx'
 import axios from 'axios';
 import { getUserInfo } from '../../utils/localstorage.jsx';
@@ -14,6 +15,8 @@ import { getUserInfo } from '../../utils/localstorage.jsx';
 let initial = false
 
 function DanceScreen(props) {
+  const [ started, setStarted ] = useState(false)
+  const countdown = 6;
   const { state } = useLocation();
   const navigate = useNavigate()
 
@@ -32,11 +35,10 @@ function DanceScreen(props) {
   liveVideos.current.srcObject = liveVideoSource;
   recordedVideos.current.srcObject = recordedVideoSource;
 
-  
   useEffect(() => {
-  const fetchId = async () => {
+    const fetchId = async () => {
     try {
-      const params = new URLSearchParams({"username": username})
+      const params = new URLSearchParams({"username": username, "dance_name": props.dance_name, "datetime": recordingDate})
       const response = await axios.get(import.meta.env.VITE_API_URL + "/detailed_scores?" + params, { responseType: 'json' });  
       if(response.data.id){
         navigate(`/scoring?id=${response.data.id}`)
@@ -52,6 +54,13 @@ function DanceScreen(props) {
     }
   }, [isConnectionClosed]);
 
+  setTimeout(() => {
+    setStarted(true)
+  }, countdown * 1000)
+
+  if(!started){
+    return <CountdownDonut initialSeconds={countdown}/>
+  }
   return (
     <div className={styles.danceScreen}>
       <div className={styles.stepper}>

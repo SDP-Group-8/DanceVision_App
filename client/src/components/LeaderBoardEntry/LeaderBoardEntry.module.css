@@ -1,0 +1,28 @@
+.container {
+    background-color: #421875;
+    width: 90%;
+    height: 3rem;
+    
+    align-items: center; 
+    justify-content: space-between; 
+    display: grid;
+    grid-template-columns: 0.3fr 1fr 1fr 1fr 1fr;
+    /* 5 equal-width columns */
+    grid-gap: 10px;
+    padding: 0rem 1rem;
+    text-align: start;
+    border-radius: 5px;
+    margin: 0.5rem 0rem;
+}
+
+.text {
+    color: white;
+}
+
+.current_user{
+    background-color: rgb(4, 111, 9);
+}
+
+.normal_user{
+    background-color: #421875;
+}

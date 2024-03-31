@@ -12,8 +12,9 @@ import {
 } from "@chakra-ui/react";
 import styles from './ProfileScoreCard.module.css'
 import { useNavigate } from "react-router-dom";
+import { getUserInfo } from "../../utils/localstorage";
 
-const ProfileScoreCard = ({refVideoName, timestamp, score, attempt, id='6602a6b812ed1e46fa7180fc' }) => {
+const ProfileScoreCard = ({refVideoName, timestamp, score, attempt, id}) => {
   const navigate = useNavigate();
 
   const handleSubmit =( ) =>
@@ -21,6 +22,10 @@ const ProfileScoreCard = ({refVideoName, timestamp, score, attempt, id='6602a6b8
     navigate(`/scoring?id=${id}`)
   }
   
+  const date = new Date(timestamp)
+  const username = getUserInfo()
+  const imageSrc = `${import.meta.env.VITE_API_URL}/user_thumbnails/${username}/thumbnails/${timestamp}.jpg`
+
   return (
     <div className={styles.body}>
       <Card
@@ -32,8 +37,8 @@ const ProfileScoreCard = ({refVideoName, timestamp, score, attempt, id='6602a6b8
         <Image
           objectFit="cover"
         //   maxW={{ base: "100%", sm: "200px" }}
-          src="https://images.unsplash.com/photo-1667489022797-ab608913feeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw5fHx8ZW58MHx8fHw%3D&auto=format&fit=crop&w=800&q=60"
-          alt="Caffe Latte"
+          src={imageSrc}
+          alt="Thumbnail"
           className={styles.video}
         />
 
@@ -42,16 +47,16 @@ const ProfileScoreCard = ({refVideoName, timestamp, score, attempt, id='6602a6b8
             {/* <Heading size="md">The perfect latte</Heading> */}
 
             <Text py="2">
-              {refVideoName}
+              Reference Video : {refVideoName}
             </Text>
             <Text py="2">
-              Score: {score}%
+              Score: {(100 * score).toFixed(2)}%
             </Text>
             <Text py="2">
               Attempt : {attempt}
             </Text>
-            <Text py="2">
-              Date and Time : {timestamp}
+            <Text pt="2">
+              Date and Time : {date.toLocaleDateString()} {date.toLocaleTimeString()}
             </Text>
           </CardBody>
 

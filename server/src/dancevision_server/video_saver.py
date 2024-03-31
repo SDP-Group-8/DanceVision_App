@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-import av
 import os
 from pathlib import Path
 
 from dancevision_server.environment import model_var_name, server_root_name
+from dancevision_server.thumbnail_creator import ThumbnailCreator
 
 from pose_estimation.mediapipe_video import MediaPipeVideo
 from pose_estimation.timestamped_keypoint_serializer import TimestampedKeypointsSerializer
 
 class VideoSaver:
-    thumbnail_extension = "jpg"
+    
 
     @staticmethod
     def get_video_directory():
@@ -27,7 +27,7 @@ class VideoSaver:
 
     @staticmethod
     def get_thumbnail_filename(video_name: Path):
-        return f"{video_name.stem}.{VideoSaver.thumbnail_extension}"
+        return f"{video_name.stem}.{ThumbnailCreator.thumbnail_extension}"
 
     @staticmethod
     def get_thumbnail_filepath(video_name: Path):
@@ -69,18 +69,7 @@ class VideoSaver:
 
     def generate_thumbnail(self):
         img_output_path = VideoSaver.get_thumbnail_filepath(self.video_filename)
-
-        with av.open(str(self.destination_file), "r") as container:
-            # Signal that we only want to look at keyframes.
-            stream = container.streams.video[0]
-            stream.codec_context.skip_frame = "NONKEY"
-
-            frame = next(container.decode(stream))
-
-            frame.to_image().save(
-                img_output_path,
-                quality=80,
-            )
+        ThumbnailCreator.create(self.destination_file, img_output_path)
 
     def save_keypoints(self):
         model_path = os.environ[model_var_name]

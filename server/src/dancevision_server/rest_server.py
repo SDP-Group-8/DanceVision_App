@@ -8,8 +8,7 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, File, UploadFile, status
-from fastapi.responses import JSONResponse
-import signal
+from fastapi.responses import JSONResponse, FileResponse
 
 import argparse
 import logging
@@ -27,6 +26,7 @@ from dancevision_server.dual_video_starter import DualVideoStarter
 from dancevision_server.keypoint_responders.keypoint_feedback import KeypointFeedback
 from dancevision_server.keypoint_responders.keypoint_naive import KeypointNaive
 from dancevision_server.score_aggregator import ScoreAggregator
+from dancevision_server.recorder import Recorder
 
 from dancevision_server import mongoServer
 
@@ -123,7 +123,7 @@ def start_streamer():
         launch_video_streamer(stream_address, stream_port)
 
 @rest_app.get("/start-reference")
-async def start_reference(video_name: str, basename: str):
+async def start_reference(video_name: str, user_id: str):
     global stream_address
     global stream_port
     global video_starter
@@ -134,7 +134,7 @@ async def start_reference(video_name: str, basename: str):
     mux = StreamMux() if file is None else LocalMux()
     video_starter = DualVideoStarter(stream_address, stream_port, mux, file, connection_offers, connection_answers)
 
-    recording_time = await video_starter.start(video_name, basename, score_aggregator)
+    recording_time = await video_starter.start(video_name, score_aggregator, user_id)
     return JSONResponse({"datetime": recording_time.isoformat()})
 
 @rest_app.delete("/clear-connection")
@@ -158,7 +158,7 @@ async def get_thumbnails():
     return {"thumbnails": [thumbnail.to_dict() for thumbnail in names]}
 
 @rest_app.get("/detailed_scores")
-async def get_detailed_scores(username: str):
+async def get_detailed_scores(username: str, dance_name: str, datetime: str):
     """
     Return detailed scores and information about frames compared so far
     :return A list of scores for each Keypoint statistics
@@ -176,8 +176,8 @@ async def get_detailed_scores(username: str):
     results = {
         'avgScores': avgScores,
         'detailed_scores' : detailed_scores,
-        "ref_video_name" : "fineese_step",
-        "time_stamp" : "2024-03-20 20:18:34"
+        "ref_video_name" : dance_name,
+        "time_stamp" : datetime
     }
 
     video_id = mongoServer.store_dance_score(username, results)
@@ -186,12 +186,12 @@ async def get_detailed_scores(username: str):
     return {"id": current_video_id}
 
 @rest_app.get("/user_video")
-async def get_user_video(video_name: str, attempt_datetime: str):
+async def get_user_video(user_id: str, attempt_datetime: str):
     """
     
     """
-    #FileResponse(path, media_type="video/mp4" )
-    return {"name": video_name}
+    path = Recorder.get_user_recording_filepath(user_id, attempt_datetime)
+    return FileResponse(path, media_type="video/mp4" )
 
 @rest_app.post("/db_detailed_score")
 async def db_detailed_score_endpoint(request : Request):
@@ -228,6 +228,17 @@ async def personal_details_endpoint(request : Request):
     data = await request.json()
     result = mongoServer.get_personal_information(data.get("username"))
     return  result
+
+@rest_app.get("/userAllDanceScores")
+async def user_all_dance_score_endpoint(username: str):
+    result = mongoServer.get_all_dance_score(username)
+    return result
+
+
+@rest_app.get("/leaderboard")
+async def get_leaderboard_data_endpoint():
+    result = mongoServer.get_leaderboard_data()
+    return result
     
     
 
@@ -325,6 +336,7 @@ def run_app(app_address, app_port, app_no_ros=True, app_stream_address=None, app
 
     thumbnails_dir = VideoSaver.get_video_directory()
     rest_app.mount("/thumbnails", StaticFiles(directory=thumbnails_dir / "thumbnails"))
+    rest_app.mount("/user_thumbnails", StaticFiles(directory=thumbnails_dir))
     uvicorn.run(rest_app, host=app_address, port=int(app_port), log_config=LOGGING_CONFIG)
 
 LOGGING_CONFIG = {

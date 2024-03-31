@@ -1,0 +1,113 @@
+.body{
+    width: 30%;
+    min-height: 10rem;
+    background-color: #7841BD;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+    padding: 1rem;
+    
+}
+
+.rankContainer{
+    background-color: #db11fb;
+    border-radius: 10px;
+}
+
+.rank{
+    text-align: center;
+    padding: 1rem 0rem;
+}
+
+.upper{
+    height: 45%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.name{
+    font-size: 1.2rem;
+}
+
+.username{
+    font-size: 0.8rem;
+}
+
+.line{
+    z-index: 15;
+    width: 80%;
+    align-self: center;
+}
+
+.lower{
+    display: flex;
+    align-items: first baseline;
+    justify-content: space-between;
+    padding: 1rem;
+}
+
+.scoreContainer{
+    text-align: end;
+}
+
+.text{
+    color: white;
+}
+
+
+/* Css for border animations */
+.fancy {
+    --offset: 3px;
+    /* background: rgb(55, 21, 90); */
+    /* border-radius: 50px; */
+    position: relative;
+    /* height: 75px;
+    width: 400px; */
+    /* max-width: 100%; */
+    overflow: hidden;
+}
+
+/* Conic gradient */
+.fancy::before { 
+    content: '';
+    background: conic-gradient(transparent 270deg, rgb(255, 255, 255), transparent);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    aspect-ratio: 1;
+    width: 100%;
+    animation: rotate 2s linear infinite;
+}
+
+/* Overlay */
+.fancy::after {
+    content: '';
+    background: inherit;
+    border-radius: inherit;
+    position: absolute;
+    inset: var(--offset);
+    height: calc(100% - 2 * var(--offset));
+    width: calc(100% - 2 * var(--offset));
+}
+
+.fancy div {
+    inset: 0;
+    z-index: 10;
+    
+}
+
+@keyframes rotate {
+    from {
+        transform: translate(-50%, -50%) scale(1.4) rotate(0turn);
+    }
+
+    to {
+        transform: translate(-50%, -50%) scale(1.4) rotate(1turn);
+    }
+}

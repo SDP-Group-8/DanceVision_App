@@ -2,6 +2,7 @@ from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
 from bson.objectid import ObjectId
+import json
 
 load_dotenv()
 
@@ -82,4 +83,34 @@ def get_all_dance_score(user_name):
     list_data = list(all_objects)
     for data in list_data:
         data['_id'] = str(data['_id'])
-    return list_data
+    return { "data": list_data }
+
+def get_leaderboard_data():
+    collections = db_dance_scores.list_collection_names()
+    top_dances = []
+
+    for collection_name in collections:
+        collection = db_dance_scores[collection_name]
+        data = collection.find().sort("avgScores.total_sccore", -1).limit(10)
+        for document in data:
+            new_entry = {
+                'username' : collection_name,
+                'score' : document.get("avgScores").get("total_score"),
+                'refVideo' : document.get('ref_video_name'),
+                'timeStamp' : document.get('time_stamp'),
+            }
+            personal_info = db_user_data.personal_information.find_one({'user_name': collection_name })
+            if personal_info is not None:
+                new_entry["name"] = personal_info.get("name")
+            else:
+                new_entry["name"] = "Not Found"
+            top_dances.append(new_entry)
+
+    # print(top_dances)
+    top_dances_sorted = sorted(top_dances, key=lambda x : x.get('score'), reverse=True)
+    top_dances_sorted = top_dances_sorted[:10]
+    print(top_dances_sorted)
+
+    return {"data": top_dances_sorted}
+ 
+
