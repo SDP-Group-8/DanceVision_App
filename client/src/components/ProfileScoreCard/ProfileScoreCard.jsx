@@ -38,7 +38,7 @@ const ProfileScoreCard = ({refVideoName, timestamp, score, attempt, id}) => {
           objectFit="cover"
         //   maxW={{ base: "100%", sm: "200px" }}
           src={imageSrc}
-          alt="Caffe Latte"
+          alt="Thumbnail"
           className={styles.video}
         />
 

@@ -1,0 +1,29 @@
+.container{
+    background-color: #db11fb;
+    height: 60px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) ;
+    z-index: 100;
+}
+
+.link_container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 350px;
+    padding-right: 30px;
+}
+
+.link{
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 400;
+}

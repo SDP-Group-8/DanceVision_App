@@ -16,6 +16,7 @@ import ProfileScoreCard from "../../components/ProfileScoreCard/ProfileScoreCard
 import usePersonalInformation from "../../hooks/usePersonalInformation";
 import { getUserInfo } from "../../utils/localstorage";
 import useUserDanceScores from "../../hooks/useUserDanceScores";
+import NavBar from "../../components/NavBar/NavBar";
 
 const ProfilePage = () => {
   const userName = getUserInfo();
@@ -30,6 +31,7 @@ const ProfilePage = () => {
 
   return (
     <div className={styles.body}>
+      <NavBar/>
       <Card
         direction={{ base: "column", sm: "row" }}
         overflow="hidden"
@@ -57,14 +59,6 @@ const ProfilePage = () => {
           />
         </div>
       </Card>
-
-      {/* <ProfileScoreCard
-        refVideoName={"Finesse Step"}
-        score={"90"}
-        attempt={"2"}
-        timestamp={"21st March 2024 23:20:25"}
-        id={"6602a6b812ed1e46fa7180fc"}
-      ></ProfileScoreCard> */}
 
       <div>
         {score && score.length > 0 ? (

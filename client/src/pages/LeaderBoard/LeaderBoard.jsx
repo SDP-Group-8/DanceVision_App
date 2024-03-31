@@ -3,6 +3,7 @@ import styles from "./LeaderBoard.module.css";
 import LeaderBoardCard from "../../components/LeaderBoardCard/LeaderBoardCard";
 import LeaderBoardEntry from "../../components/LeaderBoardEntry/LeaderBoardEntry";
 import useLeaderBoardData from "../../hooks/useLeaderBoardData";
+import NavBar from "../../components/NavBar/NavBar";
 
 const LeaderBoard = () => {
   const { data } = useLeaderBoardData(import.meta.env.VITE_API_URL);
@@ -25,6 +26,7 @@ const LeaderBoard = () => {
 
   return (
     <div className={styles.body}>
+      <NavBar/>
       <div className={styles.container}>
         
             {data && data.length >0 ? (

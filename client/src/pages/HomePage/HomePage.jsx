@@ -8,6 +8,7 @@ import styles from './HomePage.module.css'
 import logo from '../../assets/logo.png'
 import { useState } from "react";
 import { getUserInfo } from '../../utils/localstorage';
+import NavBar from '../../components/NavBar/NavBar';
 
 const HomePage = () => {
     const defaultPopup = {success:false, error:{status:false, message:""}, show:false, loading:false}
@@ -19,6 +20,7 @@ const HomePage = () => {
     return(
         <>
             <div className={styles.HomePage}>
+                <NavBar/>
                 <img className={styles.logo} src={logo} alt="logo" />
                 <h1>Welcome to DanceVision</h1>
                 <div className={styles["button-container"]}>
