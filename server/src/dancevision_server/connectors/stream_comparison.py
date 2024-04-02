@@ -4,7 +4,6 @@ from typing import Callable
 
 from aiortc import RTCPeerConnection
 from aiortc.contrib.media import MediaRelay, MediaPlayer
-from pose_estimation.mediapipe import MediaPipe
 
 from dancevision_server.connectors.connector import Connector
 from dancevision_server.pose_detection_track import PoseDetectionTrack
@@ -16,7 +15,7 @@ from dancevision_server.score_channel import ScoreChannel
 
 class StreamComparison(Connector):
 
-    def __init__(self, recorder: Recorder, parameter_path: str,  on_connection_closed: Callable, on_pose_detections: KeypointResponder, **kwargs):
+    def __init__(self, recorder: Recorder, pose_track: PoseDetectionTrack, on_connection_closed: Callable, on_pose_detections: KeypointResponder, **kwargs):
         relay = MediaRelay()
 
         self.receiver_pc = RTCPeerConnection()
@@ -34,9 +33,6 @@ class StreamComparison(Connector):
         self.player = None
         self.recorder = recorder
 
-        mediapipe = MediaPipe()
-        mediapipe.initialize(parameter_path)
-
         @self.emitter_pc.on("datachannel")
         async def on_datachannel(channel):
             if channel.label == "score":
@@ -47,7 +43,8 @@ class StreamComparison(Connector):
             self.player = MediaPlayer(**kwargs)
             self.emitter_pc.addTrack(self.player.video)
 
-            self.pose_detection_track = PoseDetectionTrack(relay.subscribe(track, buffered=False), mediapipe, on_pose_detections)
+            pose_track.set_track(relay.subscribe(track, buffered=False))
+            self.pose_detection_track = pose_track
             self.emitter_pc.addTrack(self.pose_detection_track)
 
             if self.recorder:

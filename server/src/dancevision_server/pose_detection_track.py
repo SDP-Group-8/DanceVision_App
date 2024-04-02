@@ -11,12 +11,18 @@ from pose_estimation.single_window import SingleWindow
 class PoseDetectionTrack(MediaStreamTrack):
     kind = "video"
 
-    def __init__(self, track, mediapipe: MediaPipe, on_pose_detections: KeypointFeedback):
+    def __init__(self, mediapipe: MediaPipe, on_pose_detections: KeypointFeedback = None, show_live: bool = False):
         super().__init__()  # don't forget this!
-        self.track = track
         self.mediapipe = mediapipe
         self.keypoint_feedback = on_pose_detections
         self.single_window = None
+        self.debug = show_live
+
+    def set_feedback(self, feedback):
+        self.keypoint_feedback = feedback
+
+    def set_track(self, track):
+        self.track = track
 
     def show_window(self, img):
         if self.single_window is None:
@@ -32,7 +38,9 @@ class PoseDetectionTrack(MediaStreamTrack):
         if res:
             img = SingleWindow.draw_pose_on_image(img, res.to_normalized_landmarks())
             self.keypoint_feedback.keypoint_callback(res)
-        self.show_window(img)
+
+        if self.debug:
+            self.show_window(img)
 
         # rebuild a VideoFrame, preserving timing information
         new_frame = VideoFrame.from_ndarray(img, format="bgr24")

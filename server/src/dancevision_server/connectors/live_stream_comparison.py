@@ -4,7 +4,6 @@ from typing import Callable
 
 from aiortc import RTCPeerConnection
 from aiortc.contrib.media import MediaRelay
-from pose_estimation.mediapipe import MediaPipe
 
 from dancevision_server.connectors.connector import Connector
 from dancevision_server.pose_detection_track import PoseDetectionTrack
@@ -15,7 +14,7 @@ from dancevision_server.keypoint_responders.keypoint_responder import KeypointRe
 from dancevision_server.connectors.connector import Connector
 
 class LiveStreamComparison(Connector):
-    def __init__(self, parameter_path: str, on_connection_closed: Callable, on_pose_detections: KeypointResponder, **kwargs):
+    def __init__(self, pose_track: PoseDetectionTrack, on_connection_closed: Callable, on_pose_detections: KeypointResponder, **kwargs):
         self.relay = MediaRelay()
 
         self.receiver_pc = RTCPeerConnection()
@@ -30,9 +29,6 @@ class LiveStreamComparison(Connector):
         self.received_track = None
         self.pose_detection_track = None
 
-        mediapipe = MediaPipe()
-        mediapipe.initialize(parameter_path)
-
         @self.emitter_pc.on("datachannel")
         async def on_datachannel(channel):
             if channel.label == "movement":
@@ -41,7 +37,9 @@ class LiveStreamComparison(Connector):
         @self.receiver_pc.on("track")
         async def on_track(track):
             self.received_track = track
-            self.pose_detection_track = PoseDetectionTrack(self.relay.subscribe(track, buffered=False), mediapipe, on_pose_detections)
+
+            pose_track.set_track(self.relay.subscribe(track, buffered=False))
+            self.pose_detection_track = pose_track
             self.emitter_pc.addTrack(self.pose_detection_track)
 
     async def close(self):

@@ -3,6 +3,7 @@ from __future__ import annotations
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+import os
 import logging
 
 from contextlib import asynccontextmanager
@@ -14,8 +15,12 @@ import argparse
 import logging
 import multiprocessing
 
+from pose_estimation.mediapipe import MediaPipe
+
 from dancevision_startup.launch_video_streamer import launch_video_streamer, launch_chromium
 
+from dancevision_server.environment import model_var_name
+from dancevision_server.pose_detection_track import PoseDetectionTrack
 from dancevision_server.mux.local_mux import LocalMux
 from dancevision_server.mux.stream_mux import StreamMux
 from dancevision_server.session_description import SessionDescription
@@ -42,11 +47,14 @@ address = None
 port = None
 
 file = None
+mediapipe = None
+pose_detection_track = None
 
 video_starter = None
 score_aggregator = None
 planner = None
 
+show_live = False
 no_ros = False
 robot_controller = None
 
@@ -95,14 +103,24 @@ async def start_video():
     global video_starter
     global planner
     global no_ros
+
+    global mediapipe
+    global pose_detection_track
+    global show_live
     
     """
     Start the main comparison screen with the selected video
     :param video_name: name of the video file
     """
+    mediapipe = MediaPipe()
+    parameter_path = os.environ[model_var_name]
+    mediapipe.initialize(parameter_path)
+
     mux = StreamMux() if file is None else LocalMux()
     keypoint_feedback = KeypointNaive() if no_ros else KeypointFeedback(planner)
-    video_starter = VideoStarter(stream_address, stream_port, mux, keypoint_feedback, file, connection_offers, connection_answers)
+    pose_detection_track = PoseDetectionTrack(mediapipe, keypoint_feedback, show_live)
+
+    video_starter = VideoStarter(stream_address, stream_port, mux, keypoint_feedback, pose_detection_track, file, connection_offers, connection_answers)
     await video_starter.start()
     return {"message": "Live Video Started"} 
 
@@ -129,12 +147,22 @@ async def start_reference(video_name: str, user_id: str):
     global video_starter
     global score_aggregator
 
+    global mediapipe
+    global pose_detection_track
+
     score_aggregator = ScoreAggregator()
 
-    mux = StreamMux() if file is None else LocalMux()
-    video_starter = DualVideoStarter(stream_address, stream_port, mux, file, connection_offers, connection_answers)
+    mediapipe = MediaPipe()
+    parameter_path = os.environ[model_var_name]
+    mediapipe.initialize(parameter_path)
 
-    recording_time = await video_starter.start(video_name, score_aggregator, user_id)
+    pose_detection_track = PoseDetectionTrack(mediapipe)
+
+    mux = StreamMux() if file is None else LocalMux()
+    await video_starter.close()
+    dual_video_starter = DualVideoStarter(stream_address, stream_port, mux, pose_detection_track, file, connection_offers, connection_answers)
+
+    recording_time = await dual_video_starter.start(video_name, score_aggregator, user_id)
     return JSONResponse({"datetime": recording_time.isoformat()})
 
 @rest_app.delete("/clear-connection")
@@ -311,7 +339,7 @@ async def connection_close(host_id: str):
     del connection_answers[host_id]
     return JSONResponse({"message": "Successfully cleared cache"})
 
-def run_app(app_address, app_port, app_no_ros=True, app_stream_address=None, app_stream_port=None, app_file=None):
+def run_app(app_address, app_port, app_no_ros=True, app_stream_address=None, app_stream_port=None, app_file=None, show=False):
     global address
     global port
     global robot_controller
@@ -320,6 +348,7 @@ def run_app(app_address, app_port, app_no_ros=True, app_stream_address=None, app
     global stream_port
     global file
     global planner
+    global show_live
 
     address = app_address
     port = app_port
@@ -327,6 +356,7 @@ def run_app(app_address, app_port, app_no_ros=True, app_stream_address=None, app
     stream_address = app_stream_address
     stream_port = app_stream_port
     file = app_file
+    show_live = show
 
     if not no_ros:
         from robot_controller.robot_controller_node import RobotControllerNode
@@ -381,6 +411,7 @@ def main():
     parser.add_argument("--stream-address", dest="stream_address")
     parser.add_argument("--stream-port", dest="stream_port")
     parser.add_argument("--file", dest="file")
+    parser.add_argument("--show-live", action="store_true")
     args = parser.parse_args()
 
-    run_app(args.address, args.port, args.no_ros, args.stream_address, args.stream_port, args.file)
+    run_app(args.address, args.port, args.no_ros, args.stream_address, args.stream_port, args.file, parser.show_live)

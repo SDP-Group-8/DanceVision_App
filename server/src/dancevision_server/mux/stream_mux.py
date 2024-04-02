@@ -38,9 +38,9 @@ class StreamMux:
         return partial(StreamMux.set_offer_and_get_answer, connection_offers, connection_answers)
 
     @staticmethod
-    async def create_dual_stream(offer, keypoint_feedback, recorder, connection_offers, connection_answers, filepath, **kwargs):
+    async def create_dual_stream(offer, keypoint_feedback, pose_track, recorder, connection_offers, connection_answers, filepath, **kwargs):
         callback = StreamMux.get_connection_closed_callback(connection_offers, connection_answers)
-        kwargs.update(LocalMux.get_base_kwargs(keypoint_feedback))
+        kwargs.update(LocalMux.get_base_kwargs(keypoint_feedback, pose_track))
         kwargs["file"] = str(filepath)
         comparison = StreamComparison(recorder, on_connection_closed=callback, **kwargs)
         answer = await comparison.negotiate_sender(offer)
@@ -50,9 +50,9 @@ class StreamMux:
         return comparison
 
     @staticmethod
-    async def create_single_stream(offer, keypoint_feedback, connection_offers, connection_answers, **kwargs):
+    async def create_single_stream(offer, keypoint_feedback, pose_track, connection_offers, connection_answers, **kwargs):
         callback = StreamMux.get_connection_closed_callback(connection_offers, connection_answers)
-        sender = LiveStreamComparison(on_connection_closed=callback, **LocalMux.get_base_kwargs(keypoint_feedback, **kwargs))
+        sender = LiveStreamComparison(on_connection_closed=callback, **LocalMux.get_base_kwargs(keypoint_feedback, pose_track, **kwargs))
         answer = await sender.negotiate_sender(offer)
         connection_answers[SERVER_IDENTIFIER] = answer
 
